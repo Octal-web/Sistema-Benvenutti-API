@@ -40,7 +40,7 @@ class AdminUserService
         }
     }
 
-    public function atualizarUsuario($dadosUsuario)
+    public function atualizarUsuario($dadosUsuario, $id)
     {
 
         DB::beginTransaction();
@@ -48,7 +48,7 @@ class AdminUserService
         try {
             $usuario = Usuario::query()
                 ->where([
-                    'email' => $dadosUsuario['email'],
+                    'email' => $id,
                     'funcao' => 'administrador',
                     'excluido' => NULL
                 ])

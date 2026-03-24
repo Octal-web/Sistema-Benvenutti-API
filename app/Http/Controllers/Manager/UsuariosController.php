@@ -205,7 +205,7 @@ class UsuariosController extends Controller
         $dadosUsuario = $request->only(['nome', 'email', 'password', 'ativo']);
 
         try {
-            $response = $this->adminUserService->atualizarUsuario($dadosUsuario);
+            $response = $this->adminUserService->atualizarUsuario($dadosUsuario, $id);
 
             return response()->json([
                 'success' => true,

@@ -4,126 +4,51 @@ namespace App\Services;
 
 use App\Models\Usuario;
 use App\Models\Participante;
-use App\Models\Passaporte;
-use App\Models\Documento;
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 
 class MemberService
 {
-    public function cadastrarParticipante($dadosUsuario, $dadosParticipante, $dadosDestinos, $dadosPassaporte, $imgDocumentos)
+    public function convidarParticipante($dadosConvidado)
     {
         DB::beginTransaction();
 
         try {
+            $tokenString = md5(uniqid((string) rand(), true));
+
             $usuario = Usuario::create([
-                'nome' => $dadosUsuario['nome'],
-                'email' => $dadosUsuario['email'],
+                'nome' => $dadosConvidado['nome'] ?? null,
+                'email' => $dadosConvidado['email'],
                 'funcao' => 'participante',
-                'password' => Hash::make($dadosUsuario['password']),
-                'ativo' => $dadosUsuario['ativo']
+                'token' => $tokenString,
+                'password' => null,
+                'ativo' => true,
             ]);
-            
+
             $participante = Participante::create([
-                'nome_completo' => $dadosParticipante['nome_completo'],
-                'cpf' => preg_replace('/\D/', '', $dadosParticipante['cpf']),
-                'data_nascimento' => Carbon::createFromFormat('Y-m-d', $dadosParticipante['data_nascimento'])->format('Y-m-d'),
-                'rg' => $dadosParticipante['rg'],
-                'data_expedicao_rg' => Carbon::createFromFormat('Y-m-d', $dadosParticipante['data_expedicao_rg'])->format('Y-m-d'),
-                'fone_celular' => $dadosParticipante['fone_celular'],
-                'fone_emergencia' => $dadosParticipante['fone_emergencia'],
-                // 'fone_fixo' => $dadosParticipante['fone_fixo'] ?? null,
-                // 'fone_comercial' => $dadosParticipante['fone_comercial'],
-                'restricao_alimentar' => $dadosParticipante['restricao_alimentar'],
-                'restricao_alimentar_qual' => $dadosParticipante['restricao_alimentar'] ? $dadosParticipante['restricao_alimentar_qual'] : null,
-                'limitacao' => $dadosParticipante['limitacao'],
-                'limitacao_qual' => $dadosParticipante['limitacao'] ? $dadosParticipante['limitacao_qual'] : null,
-                'medicamento' => $dadosParticipante['medicamento'],
-                'medicamento_qual' => $dadosParticipante['medicamento'] ? $dadosParticipante['medicamento_qual'] : null,
-                'medicamento_dosagem' => ($dadosParticipante['medicamento'] && isset($dadosParticipante['medicamento_dosagem'])) ? $dadosParticipante['medicamento_dosagem'] : null,
-                'problema_saude' => $dadosParticipante['problema_saude'],
-                'problema_saude_qual' => $dadosParticipante['problema_saude'] ? $dadosParticipante['problema_saude_qual'] : null,
-                'aprovado_bloqueado' => $dadosParticipante['aprovado_bloqueado'],
-                'conferido' => $dadosParticipante['conferido'],
-                'confirmado' => $dadosParticipante['confirmado'],
                 'usuario_id' => $usuario->id,
-                'etapa_cadastro' => 'concluido',
+                'etapa_cadastro' => 'convidado',
             ]);
 
-            if (!empty($dadosDestinos['destinos'])) {
-                $participante->destinos()->sync($dadosDestinos['destinos']);
-            }
-
-            $passaporte = Passaporte::create([
-                'numero' => $dadosPassaporte['numero'],
-                'paginas_em_branco' => $dadosPassaporte['paginas_em_branco'],
-                'data_emissao' => Carbon::createFromFormat('Y-m-d', $dadosPassaporte['data_emissao'])->format('Y-m-d'),
-                'data_validade' => Carbon::createFromFormat('Y-m-d', $dadosPassaporte['data_validade'])->format('Y-m-d'),
-                'participante_id' => $participante->id
-            ]);
-
-            $documento = null;
-
-            if ($imgDocumentos['passaporte_arquivo'] || $imgDocumentos['certificado_arquivo']) {
-                if ($imgDocumentos['passaporte_arquivo']) {
-                    $passaporte = md5(uniqid(rand(), true)) . '.' . $imgDocumentos['passaporte_arquivo']->getClientOriginalExtension();
-                }
-
-                // if ($imgDocumentos['rg']) {
-                //     $rg = md5(uniqid(rand(), true)) . '.' . $imgDocumentos['rg']->getClientOriginalExtension();
-                // }
-                
-                if ($imgDocumentos['certificado_arquivo']) {
-                    $certificado = md5(uniqid(rand(), true)) . '.' . $imgDocumentos['certificado_arquivo']->getClientOriginalExtension();
-                }
-
-                $documento = Documento::create([
-                    'passaporte' => isset($passaporte) ? $passaporte : null,
-                    'passaporte_status' => $imgDocumentos['passaporte_status'],
-                    // 'rg' => $rg ? $rg : null,
-                    'certificado' => isset($certificado) ? $certificado : null,
-                    'certificado_status' => $imgDocumentos['certificado_status'],
-                    'participante_id' => $participante->id,
-                ]);
-            }
-        
-            if ($imgDocumentos['passaporte_arquivo']) {
-                $imgDocumentos['passaporte_arquivo']->move(base_path('../todeschini-media/uploads/documents/passport/'), $passaporte);
-            }
-            
-            // if ($imgDocumentos['rg']) {
-            //     $imgDocumentos['rg']->move(base_path('../todeschini/uploads/documents/rg/'), $rg);
-            // }
-
-            if ($imgDocumentos['certificado_arquivo']) {
-                $imgDocumentos['certificado_arquivo']->move(base_path('../todeschini-media/uploads/documents/certificate/'), $certificado);
-            }
+            $this->sendConviteEmail($usuario->email, $usuario->nome ?? null, $usuario->token);
 
             DB::commit();
 
-            return response()->json([
+            return [
                 'usuario' => $usuario,
                 'participante' => $participante,
-                'passaporte' => $passaporte,
-                'documento' => $documento
-            ], 201);
+            ];
         } catch (\Exception $e) {
             DB::rollBack();
-
-            return response()->json([
-                'message' => 'Ocorreu um erro!',
-                'errors' => [
-                    'general' => [$e->getMessage()]
-                ]
-            ], 500);
+            throw new \Exception('Erro ao convidar participante: ' . $e->getMessage());
         }
     }
 
-    public function atualizarParticipante($dadosUsuario, $dadosParticipante, $dadosDestinos, $dadosPassaporte, $imgDocumentos, $id)
+    public function atualizarParticipante($dadosUsuario, $dadosParticipante, $id)
     {
-
         DB::beginTransaction();
 
         try {
@@ -131,119 +56,65 @@ class MemberService
                 ->where([
                     'id' => $id,
                     'funcao' => 'participante',
-                    'excluido' => NULL
+                    'excluido' => NULL,
                 ])
-                ->with(['participante.passaporte' => function ($q) {
-                    $q->where('excluido', NULL);
-                }])
-                ->with(['participante.documento' => function ($q) {
-                    $q->where('excluido', NULL);
-                }])
                 ->with(['participante' => function ($q) {
                     $q->where('excluido', NULL);
                 }])
                 ->first();
 
             if (!$usuario) {
-                throw new \Exception('Não há registro desse e-mail no programa!');
+                throw new \Exception('Participante não encontrado.');
             }
 
             $usuario->update([
                 'nome' => $dadosUsuario['nome'],
                 'email' => $dadosUsuario['email'],
-                'password' => isset($dadosUsuario['password']) && $dadosUsuario['password'] ? Hash::make($dadosUsuario['password']) : $usuario->password,
-                'ativo' => $dadosUsuario['ativo']
+                'password' => isset($dadosUsuario['password']) && $dadosUsuario['password']
+                    ? Hash::make($dadosUsuario['password'])
+                    : $usuario->password,
+                'ativo' => $dadosUsuario['ativo'],
             ]);
 
             $participante = $usuario->participante;
             $participante->update([
-                'nome_completo' => $dadosParticipante['nome_completo'],
                 'cpf' => preg_replace('/\D/', '', $dadosParticipante['cpf']),
                 'data_nascimento' => Carbon::createFromFormat('Y-m-d', $dadosParticipante['data_nascimento'])->format('Y-m-d'),
                 'rg' => $dadosParticipante['rg'],
                 'data_expedicao_rg' => Carbon::createFromFormat('Y-m-d', $dadosParticipante['data_expedicao_rg'])->format('Y-m-d'),
                 'fone_celular' => $dadosParticipante['fone_celular'],
                 'fone_emergencia' => $dadosParticipante['fone_emergencia'],
-                // 'fone_fixo' => $dadosParticipante['fone_fixo'] ?? null,
-                // 'fone_comercial' => $dadosParticipante['fone_comercial'],
                 'restricao_alimentar' => $dadosParticipante['restricao_alimentar'],
-                'restricao_alimentar_qual' => $dadosParticipante['restricao_alimentar'] ? $dadosParticipante['restricao_alimentar_qual'] : null,
+                'restricao_alimentar_qual' => $dadosParticipante['restricao_alimentar']
+                    ? ($dadosParticipante['restricao_alimentar_qual'] ?? null)
+                    : null,
                 'limitacao' => $dadosParticipante['limitacao'],
-                'limitacao_qual' => $dadosParticipante['limitacao'] ? $dadosParticipante['limitacao_qual'] : null,
+                'limitacao_qual' => $dadosParticipante['limitacao']
+                    ? ($dadosParticipante['limitacao_qual'] ?? null)
+                    : null,
                 'medicamento' => $dadosParticipante['medicamento'],
-                'medicamento_qual' => $dadosParticipante['medicamento'] ? $dadosParticipante['medicamento_qual'] : null,
-                'medicamento_dosagem' => ($dadosParticipante['medicamento'] && isset($dadosParticipante['medicamento_dosagem'])) ? $dadosParticipante['medicamento_dosagem'] : null,
+                'medicamento_qual' => $dadosParticipante['medicamento']
+                    ? ($dadosParticipante['medicamento_qual'] ?? null)
+                    : null,
+                'medicamento_dosagem' => ($dadosParticipante['medicamento'] && isset($dadosParticipante['medicamento_dosagem']))
+                    ? $dadosParticipante['medicamento_dosagem']
+                    : null,
                 'problema_saude' => $dadosParticipante['problema_saude'],
-                'problema_saude_qual' => $dadosParticipante['problema_saude'] ? $dadosParticipante['problema_saude_qual'] : null,
-                'aprovado_bloqueado' => $dadosParticipante['aprovado_bloqueado'],
-                'conferido' => $dadosParticipante['conferido'],
-                'confirmado' => $dadosParticipante['confirmado'],
+                'problema_saude_qual' => $dadosParticipante['problema_saude']
+                    ? ($dadosParticipante['problema_saude_qual'] ?? null)
+                    : null,
                 'etapa_cadastro' => 'concluido',
             ]);
 
-            if (!empty($dadosDestinos['destinos'])) {
-                $participante->destinos()->sync($dadosDestinos['destinos']);
-            }
-
-            if ($dadosPassaporte) {
-                if ($participante->passaporte) {
-                    $participante->passaporte->update([
-                        'numero' => $dadosPassaporte['numero'],
-                        'paginas_em_branco' => $dadosPassaporte['paginas_em_branco'],
-                        'data_emissao' => Carbon::createFromFormat('Y-m-d', $dadosPassaporte['data_emissao'])->format('Y-m-d'),
-                        'data_validade' => Carbon::createFromFormat('Y-m-d', $dadosPassaporte['data_validade'])->format('Y-m-d'),
-                    ]);
-                } else {
-                    Passaporte::create([
-                        'numero' => $dadosPassaporte['numero'],
-                        'paginas_em_branco' => $dadosPassaporte['paginas_em_branco'],
-                        'data_emissao' => Carbon::createFromFormat('Y-m-d', $dadosPassaporte['data_emissao'])->format('Y-m-d'),
-                        'data_validade' => Carbon::createFromFormat('Y-m-d', $dadosPassaporte['data_validade'])->format('Y-m-d'),
-                        'participante_id' => $participante->id,
-                    ]);
-                }
-            }
-
-            $documento = $participante->documento ?? new Documento(['participante_id' => $participante->id]);
-
-            if ($imgDocumentos['passaporte_arquivo'] || $imgDocumentos['certificado_arquivo']) {
-                if ($imgDocumentos['passaporte_arquivo']) {
-                    $passaporte = md5(uniqid(rand(), true)) . '.' . $imgDocumentos['passaporte_arquivo']->getClientOriginalExtension();
-                    $imgDocumentos['passaporte_arquivo']->move(base_path('../todeschini-media/uploads/documents/passport/'), $passaporte);
-                    $documento->passaporte = $passaporte;
-                }
-
-
-                // if ($imgDocumentos['rg']) {
-                //     $rg = md5(uniqid(rand(), true)) . '.' . $imgDocumentos['rg']->getClientOriginalExtension();
-                //     $imgDocumentos['rg']->move(public_path('uploads/documents/rg/'), $rg);
-                //     $documento->rg = $rg;
-                // }
-
-                if ($imgDocumentos['certificado_arquivo']) {
-                    $certificado = md5(uniqid(rand(), true)) . '.' . $imgDocumentos['certificado_arquivo']->getClientOriginalExtension();
-                    $imgDocumentos['certificado_arquivo']->move(base_path('../todeschini-media/uploads/documents/certificate/'), $certificado);
-                    $documento->certificado = $certificado;
-                }
-
-            }
-
-            $documento->passaporte_status = $imgDocumentos['passaporte_status'];
-            $documento->certificado_status = $imgDocumentos['certificado_status'];
-                
-            $documento->save();
-
             DB::commit();
 
-            return response()->json([
+            return [
                 'usuario' => $usuario,
                 'participante' => $participante,
-                'passaporte' => $participante->passaporte,
-                'documento' => $documento,
-            ], 200);
+            ];
         } catch (\Exception $e) {
             DB::rollBack();
-            throw new \Exception('Erro ao solicitar a alteração: ' . $e->getMessage());
+            throw new \Exception('Erro ao atualizar participante: ' . $e->getMessage());
         }
     }
 
@@ -255,148 +126,101 @@ class MemberService
             $response = Usuario::query()
                 ->where([
                     'excluido' => NULL,
-                    'funcao' => 'participante'
+                    'funcao' => 'participante',
                 ])
                 ->whereIn('id', $ids)
                 ->update([
-                    'excluido' => Carbon::now()
+                    'excluido' => Carbon::now(),
                 ]);
 
             if ($response === 0) {
-                return response()->json([
-                    'message' => 'Nenhum registro encontrado para exclusão.',
-                ], 404);
+                throw new \Exception('Nenhum registro encontrado para exclusão.');
             }
 
             DB::commit();
 
-            return response()->json([
-                'message' => 'Registros excluídos com sucesso.',
+            return [
                 'excluidos' => $ids,
-            ], 200);
+            ];
         } catch (\Exception $e) {
             DB::rollBack();
-
-            return response()->json([
-                'message' => 'Ocorreu um erro ao excluir os registros!',
-                'errors' => [
-                    'general' => [$e->getMessage()],
-                ],
-            ], 500);
+            throw new \Exception('Erro ao excluir participantes: ' . $e->getMessage());
         }
     }
 
-    public function aprovarParticipantes($ids)
+    public function ativarParticipantes($ids)
     {
         DB::beginTransaction();
 
         try {
-            $response = Participante::query()
+            $response = Usuario::query()
                 ->where([
                     'excluido' => NULL,
+                    'funcao' => 'participante',
                 ])
-                ->whereIn('usuario_id', $ids)
+                ->whereIn('id', $ids)
                 ->update([
-                    'aprovado_bloqueado' => true
+                    'ativo' => true,
                 ]);
 
             if ($response === 0) {
-                return response()->json([
-                    'message' => 'Nenhum registro encontrado para aprovação.',
-                ], 404);
+                throw new \Exception('Nenhum registro encontrado para ativação.');
             }
 
             DB::commit();
 
-            return response()->json([
-                'message' => 'Registros aprovados com sucesso.',
-                'excluidos' => $ids,
-            ], 200);
+            return [
+                'ativados' => $ids,
+            ];
         } catch (\Exception $e) {
             DB::rollBack();
-
-            return response()->json([
-                'message' => 'Ocorreu um erro ao aprovar os registros!',
-                'errors' => [
-                    'general' => [$e->getMessage()],
-                ],
-            ], 500);
+            throw new \Exception('Erro ao ativar participantes: ' . $e->getMessage());
         }
     }
 
-    public function conferirParticipantes($ids)
+    public function desativarParticipantes($ids)
     {
         DB::beginTransaction();
 
         try {
-            $response = Participante::query()
+            $response = Usuario::query()
                 ->where([
                     'excluido' => NULL,
+                    'funcao' => 'participante',
                 ])
-                ->whereIn('usuario_id', $ids)
+                ->whereIn('id', $ids)
                 ->update([
-                    'conferido' => true
+                    'ativo' => false,
                 ]);
 
             if ($response === 0) {
-                return response()->json([
-                    'message' => 'Nenhum registro encontrado para aprovação.',
-                ], 404);
+                throw new \Exception('Nenhum registro encontrado para desativação.');
             }
 
             DB::commit();
 
-            return response()->json([
-                'message' => 'Registros conferidos com sucesso.',
-                'excluidos' => $ids,
-            ], 200);
+            return [
+                'desativados' => $ids,
+            ];
         } catch (\Exception $e) {
             DB::rollBack();
-
-            return response()->json([
-                'message' => 'Ocorreu um erro ao conferir os registros!',
-                'errors' => [
-                    'general' => [$e->getMessage()],
-                ],
-            ], 500);
+            throw new \Exception('Erro ao desativar participantes: ' . $e->getMessage());
         }
     }
 
-    public function confirmarParticipantes($ids)
+    private function sendConviteEmail($email, $nome = null, $token)
     {
-        DB::beginTransaction();
+        $data = [
+            'email' => $email,
+            'nome' => $nome,
+            'token' => $token
+        ];
 
-        try {
-            $response = Participante::query()
-                ->where([
-                    'excluido' => NULL,
-                ])
-                ->whereIn('usuario_id', $ids)
-                ->update([
-                    'confirmado' => true
-                ]);
-
-            if ($response === 0) {
-                return response()->json([
-                    'message' => 'Nenhum registro encontrado para aprovação.',
-                ], 404);
-            }
-
-            DB::commit();
-
-            return response()->json([
-                'message' => 'Registros confirmados com sucesso.',
-                'excluidos' => $ids,
-            ], 200);
-        } catch (\Exception $e) {
-            DB::rollBack();
-
-            return response()->json([
-                'message' => 'Ocorreu um erro ao confirmar os registros!',
-                'errors' => [
-                    'general' => [$e->getMessage()],
-                ],
-            ], 500);
-        }
+        Mail::send('emails.convite', $data, function ($message) use ($data) {
+            $message->from('naoresponda@benvenuttionline.com.br', 'Móveis Benvenutti')
+                    ->to($data['email'])
+                    ->bcc('rafael@exemplo.com.br')
+                    ->subject('Você foi convidado para o sistema de pontuações Benvenutti.');
+        });
     }
 }

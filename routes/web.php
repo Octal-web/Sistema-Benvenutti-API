@@ -57,9 +57,12 @@ $router->group(['prefix' => '/manager'], function () use ($router) {
         $router->get('/participantes/{id}', 'Manager\ParticipantesController@getParticipante');
         $router->post('/participantes/atualizar/{id}', 'Manager\ParticipantesController@updateParticipante');
         $router->delete('/participantes/excluir/{ids}', 'Manager\ParticipantesController@deleteParticipantes');
-        $router->put('/participantes/aprovar/{ids}', 'Manager\ParticipantesController@approveParticipantes');
-        $router->put('/participantes/conferir/{ids}', 'Manager\ParticipantesController@checkParticipantes');
-        $router->put('/participantes/confirmar/{ids}', 'Manager\ParticipantesController@confirmParticipantes');
+        $router->post('/participantes/ativar/{id}', 'Manager\ParticipantesController@activeParticipantes');
+        $router->post('/participantes/desativar/{id}', 'Manager\ParticipantesController@deactiveParticipantes');
+
+        $router->post('/participantes/pontos/novo/{id}/{tipo}', 'Manager\PontosController@createPonto');
+        $router->post('/participantes/pontos/atualizar/{id}', 'Manager\PontosController@updatePonto');
+        $router->delete('/participantes/pontos/{ids}', 'Manager\PontosController@deletePontos');
 
         $router->group(['prefix' => '/relatorios'], function () use ($router) {
             $router->get('/participantes/geral', 'Manager\RelatoriosController@getParticipantes');
