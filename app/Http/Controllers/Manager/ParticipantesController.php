@@ -215,7 +215,8 @@ class ParticipantesController extends Controller
                     'id' => $ponto->id,
                     'quantidade' => $ponto->quantidade,
                     'tipo' => $ponto->tipo,
-                    'descricao' => $ponto->descricao
+                    'descricao' => $ponto->descricao,
+                    'data' => $ponto->criado->format('d-m-Y')
                 ];
             })
         ];
