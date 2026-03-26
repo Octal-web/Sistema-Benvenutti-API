@@ -33,7 +33,7 @@ class MemberService
                 'etapa_cadastro' => 'convidado',
             ]);
 
-            // $this->sendConviteEmail($usuario->email, $usuario->nome ?? null, $usuario->token);
+            $this->sendConviteEmail($usuario->email, $usuario->nome ?? null, $usuario->token);
 
             DB::commit();
 
@@ -216,10 +216,10 @@ class MemberService
             'token' => $token
         ];
 
-        Mail::send('emails.convite', $data, function ($message) use ($data) {
+        Mail::send('emails.register', $data, function ($message) use ($data) {
             $message->from('naoresponda@benvenuttionline.com.br', 'Móveis Benvenutti')
                     ->to($data['email'])
-                    ->bcc('rafael@exemplo.com.br')
+                    ->bcc('rafael@8poroito.com.br')
                     ->subject('Você foi convidado para o sistema de pontuações Benvenutti.');
         });
     }
