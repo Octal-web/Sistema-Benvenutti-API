@@ -2,42 +2,32 @@
 
 namespace App\Services;
 
-use App\Models\Usuario;
-use App\Models\Participante;
-use App\Models\Passaporte;
-
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 
 class UserService
 {
-    public function atualizarCadastro($dadosUsuario, $dadosParticipante, $dadosPassaporte)
+    public function atualizarCadastro($usuario, $dadosUsuario, $dadosParticipante)
     {
-        DB::beginTransaction();
-
         try {
-            $usuario = auth()->user();
+            DB::beginTransaction();
 
             if (!$usuario->ativo) {
                 throw new \Exception('Usuário inativo. Não é possível realizar a atualização.');
             }
-            
+
             $usuario->update($dadosUsuario);
 
             $participante = $usuario->participante;
-            
+
             $participante->update([
-                'nome_completo' => $dadosParticipante['nome_completo'],
                 'cpf' => preg_replace('/\D/', '', $dadosParticipante['cpf']),
-                'data_nascimento' => Carbon::createFromFormat('Y-m-d', $dadosParticipante['data_nascimento'])->format('Y-m-d'),
+                'data_nascimento' => Carbon::createFromFormat('d/m/Y', $dadosParticipante['data_nascimento'])->format('Y-m-d'),
                 'rg' => $dadosParticipante['rg'],
-                'data_expedicao_rg' => Carbon::createFromFormat('Y-m-d', $dadosParticipante['data_expedicao_rg'])->format('Y-m-d'),
+                'data_expedicao_rg' => Carbon::createFromFormat('d/m/Y', $dadosParticipante['data_expedicao_rg'])->format('Y-m-d'),
                 'fone_celular' => $dadosParticipante['fone_celular'],
-                // 'fone_fixo' => $dadosParticipante['fone_fixo'] ?? null,
-                // 'fone_comercial' => $dadosParticipante['fone_comercial'],
                 'fone_emergencia' => $dadosParticipante['fone_emergencia'],
-                'etapa_cadastro' => 'dados_adicionais',
+                'etapa_cadastro' => 'concluido',
                 'restricao_alimentar' => $dadosParticipante['restricao_alimentar'],
                 'restricao_alimentar_qual' => $dadosParticipante['restricao_alimentar'] ? $dadosParticipante['restricao_alimentar_qual'] : null,
                 'limitacao' => $dadosParticipante['limitacao'],
@@ -49,40 +39,12 @@ class UserService
                 'problema_saude_qual' => $dadosParticipante['problema_saude'] ? $dadosParticipante['problema_saude_qual'] : null,
             ]);
 
-            if ($participante->passaporte) {
-                $participante->passaporte()->update([
-                    'numero' => $dadosPassaporte['numero'],
-                    'paginas_em_branco' => $dadosPassaporte['paginas_em_branco'],
-                    'data_emissao' => Carbon::createFromFormat('Y-m-d', $dadosPassaporte['data_emissao'])->format('Y-m-d'),
-                    'data_validade' => Carbon::createFromFormat('Y-m-d', $dadosPassaporte['data_validade'])->format('Y-m-d'),
-                ]);
-            } else {
-               $participante->passaporte = Passaporte::create([
-                    'numero' => $dadosPassaporte['numero'],
-                    'paginas_em_branco' => $dadosPassaporte['paginas_em_branco'],
-                    'data_emissao' => Carbon::createFromFormat('Y-m-d', $dadosPassaporte['data_emissao'])->format('Y-m-d'),
-                    'data_validade' => Carbon::createFromFormat('Y-m-d', $dadosPassaporte['data_validade'])->format('Y-m-d'),
-                    'participante_id' => $participante->id
-                ]);
-            }
-
-            $participante->destinos()->sync($dadosParticipante['destinos']);
-            
             DB::commit();
 
-            return [
-                'usuario' => $usuario,
-                'participante' => $participante
-            ];
+            return $usuario->load('participante');
         } catch (\Exception $e) {
-            DB::rollBack();
-
-            return response()->json([
-                'message' => 'Ocorreu um erro!',
-                'errors' => [
-                    'general' => [$e->getMessage()]
-                ]
-            ], 500);
+            DB::rollback();
+            throw new \Exception('Ocorreu um erro ao atualizar o perfil: ' . $e->getMessage());
         }
     }
 }
