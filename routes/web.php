@@ -33,12 +33,15 @@ $router->group(['prefix' => '/senha'], function () use ($router) {
 });
 
 $router->group(['prefix' => '/cadastro'], function () use ($router) {
-    $router->get('/usuario', 'CadastroController@getCadastro');
-    $router->post('/finalizar/{token}', 'CadastroController@etapa1');
+    $router->get('/usuario/{token}', 'CadastroController@getUsuario');
+    $router->post('/finalizar/{token}', 'CadastroController@finalizar');
 });
 
 $router->group(['prefix' => '/painel', 'middleware' => 'participante'], function () use ($router) {
     $router->get('/usuario', 'UsuariosController@getUsuario');
+    $router->put('/usuario/atualizar', 'UsuariosController@updateUsuario');
+
+    $router->get('/ranking', 'RankingController');
 });
 
 $router->group(['prefix' => '/manager'], function () use ($router) {
@@ -67,15 +70,22 @@ $router->group(['prefix' => '/manager'], function () use ($router) {
         $router->group(['prefix' => '/relatorios'], function () use ($router) {
             $router->get('/participantes/geral', 'Manager\RelatoriosController@getParticipantes');
             $router->get('/participantes/export', 'Manager\RelatoriosController@exportParticipantes');
-            
+
             $router->get('/participantes/documentos', 'Manager\RelatoriosController@getParticipantesDocs');
             $router->get('/participantes/documentos/export', 'Manager\RelatoriosController@exportParticipantesDocs');
         });
+
+        // $router->group(['prefix' => '/galerias'], function () use ($router) { 
+        //     $router->get('/imagens', 'Manager\GaleriaController@getImagens');
+        //     $router->get('/imagem/{id}', 'Manager\GaleriaController@getImagens');
+
+        //     $router->get('/participantes/export', 'Manager\GaleriaController@exportParticipantes');
+        // });
 
         $router->get('/usuarios', 'Manager\UsuariosController@getUsuarios');
         $router->post('/usuarios/novo', 'Manager\UsuariosController@createUsuario');
         $router->get('/usuarios/{id}', 'Manager\UsuariosController@getUsuario');
         $router->post('/usuarios/atualizar/{id}', 'Manager\UsuariosController@updateUsuario');
         $router->delete('/usuarios/excluir/{ids}', 'Manager\UsuariosController@deleteUsuarios');
-    });   
+    });
 });
