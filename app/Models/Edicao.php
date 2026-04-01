@@ -15,7 +15,8 @@ class Edicao extends Model
      */
     protected $fillable = [
         'destino',
-        'ano'
+        'ano',
+        'visivel',
     ];
 
     protected $guarded = ['id'];
