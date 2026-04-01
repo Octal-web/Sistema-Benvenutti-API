@@ -19,77 +19,45 @@ class GaleriasController extends Controller
 
     public function getGalerias()
     {
-        try {
-            $galeria = Galeria::query()
-                ->where([
-                    'excluido' => NULL,
-                ])
-                ->orderBy('ano', 'DESC')
-                ->get();
+        $galeria = Galeria::query()
+            ->where([
+                'excluido' => NULL,
+            ])
+            ->orderBy('ano', 'DESC')
+            ->orderBy('id', 'DESC')
+            ->get()
+            ->map(function ($galeria) {
+                return [
+                    'id' => $galeria->id,
+                    'nome' => $galeria->destino,
+                    'ano' => $galeria->ano
+                ];
+            });
 
-            if ($galeria->isEmpty()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Nenhuma galeria encontrada.'
-                ], 404);
-            }
+        return response()->json([
+            'galerias' => $galeria
 
-            return response()->json([
-                'galerias' => $galeria->map(function ($item) {
-                    return [
-                        'id' => $item->id,
-                        'destino' => $item->destino,
-                        'ano' => $item->ano
-                    ];
-                })
-            ]);
-        } catch (QueryException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Erro ao buscar galerias',
-                'error' => $e->getMessage(),
-            ], 500);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Erro inesperado ao processar a solicitação.',
-                'error' => $e->getMessage(),
-            ], 500);
-        }
+        ]);
     }
 
     public function getGaleria($id)
     {
-        try {
-            $galeria = Galeria::query()
-                ->where([
-                    'id' => $id,
-                    'excluido' => NULL,
-                ])
-                ->first();
+        $galeria = Galeria::query()
+            ->where([
+                'id' => $id,
+                'excluido' => NULL,
+            ])
+            ->first();
 
-            if (!$galeria) {
-                throw new \Exception('Galeria não encontrado.');
-            }
+        $galeriaData = [
+            'id' => $galeria->id,
+            'destino' => $galeria->destino,
+            'ano' => $galeria->ano
+        ];
 
-            return response()->json([
-                'id' => $galeria->id,
-                'destino' => $galeria->destino,
-                'ano' => $galeria->ano
-            ]);
-        } catch (QueryException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Erro ao buscar galeria',
-                'error' => $e->getMessage(),
-            ], 500);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Erro inesperado ao processar a solicitação.',
-                'error' => $e->getMessage(),
-            ], 500);
-        }
+        return response()->json([
+            'galeria' => $galeriaData
+        ]);
     }
 
     public function createGaleria(Request $request)
