@@ -1,0 +1,1193 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "API Sistema de Pontuação",
+        "version": "1.3.0"
+    },
+    "servers": [
+        {
+            "url": "https://sistema-benvenutti-api.oitoporoito.com.br/"
+        }
+    ],
+
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT"
+            }
+        },
+
+        "schemas": {
+            "RankingItem": {
+                "type": "object",
+                "properties": {
+                    "id": { "type": "integer" },
+                    "nome": { "type": "string" },
+                    "pontos": { "type": "number" },
+                    "isCurrent": { "type": "boolean" },
+                    "posicao": { "type": "integer" }
+                }
+            },
+
+            "PartipanteConvidadoDetalhe": {
+                "type": "object",
+                "properties": {
+                    "nome": { "type": "string" },
+                    "email": { "type": "string" }
+                }
+            },
+
+            "FotoItem": {
+                "type": "object",
+                "properties": {
+                    "id": { "type": "integer" },
+                    "imagem": { "type": "string", "format": "uri" },
+                    "ordem": { "type": "integer" },
+                    "visivel": { "type": "boolean" },
+                    "edicao_id": { "type": "integer" }
+                }
+            },
+
+            "EdicaoItem": {
+                "type": "object",
+                "properties": {
+                    "id": { "type": "integer" },
+                    "destino": { "type": "string" },
+                    "ano": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2016"
+                    },
+                    "visivel": { "type": "boolean" }
+                }
+            },
+
+            "EdicaoDetalhe": {
+                "type": "object",
+                "required": ["destino", "ano"],
+                "properties": {
+                    "destino": { "type": "string" },
+                    "ano": { "type": "string", "minimum": 1900 }
+                }
+            },
+
+            "UsuarioItem": {
+                "type": "object",
+                "properties": {
+                    "nome": { "type": "string" },
+                    "total_pontos": { "type": "number" },
+                    "posicao": { "type": "integer" }
+                }
+            },
+
+            "ParticipanteListItem": {
+                "type": "object",
+                "properties": {
+                    "id": { "type": "integer" },
+                    "nome": { "type": "string" },
+                    "email": { "type": "string" },
+                    "etapa_cadastro": { "type": "string" },
+                    "pontos": { "type": "number" },
+                    "posicao": { "type": "integer" },
+                    "ultimo_acesso": { "type": "string" },
+                    "ultimo_acesso_ha": { "type": "string" }
+                }
+            },
+
+            "ParticipanteDetalhe": {
+                "type": "object",
+                "properties": {
+                    "id": { "type": "integer" },
+                    "nome": { "type": "string" },
+                    "email": { "type": "string" },
+                    "cpf": { "type": "string", "nullable": true },
+                    "rg": { "type": "string" },
+                    "data_nascimento": { "type": "string", "format": "date" },
+                    "fone_celular": { "type": "string" },
+                    "fone_emergencia": { "type": "string" },
+                    "ativo": { "type": "boolean" },
+                    "etapa_cadastro": { "type": "string" },
+
+                    "restricao_alimentar": { "type": "boolean" },
+                    "restricao_alimentar_qual": {
+                        "type": "string",
+                        "nullable": true
+                    },
+
+                    "limitacao": { "type": "boolean" },
+                    "limitacao_qual": { "type": "string", "nullable": true },
+
+                    "medicamento": { "type": "boolean" },
+                    "medicamento_qual": { "type": "string", "nullable": true },
+                    "medicamento_dosagem": {
+                        "type": "string",
+                        "nullable": true
+                    },
+
+                    "problema_saude": { "type": "boolean" },
+                    "problema_saude_qual": {
+                        "type": "string",
+                        "nullable": true
+                    },
+
+                    "pontos": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PontoDetalhe"
+                        }
+                    }
+                }
+            },
+
+            "ParticipanteUpdate": {
+                "type": "object",
+                "required": [
+                    "nome",
+                    "email",
+                    "ativo",
+                    "cpf",
+                    "data_nascimento"
+                ],
+                "properties": {
+                    "nome": { "type": "string" },
+                    "email": { "type": "string" },
+                    "password": { "type": "string" },
+                    "ativo": { "type": "boolean" },
+                    "cpf": { "type": "string" },
+                    "data_nascimento": { "type": "string", "format": "date" },
+                    "rg": { "type": "string" },
+                    "data_expedicao_rg": { "type": "string", "format": "date" },
+                    "fone_celular": { "type": "string" },
+                    "fone_emergencia": { "type": "string" },
+                    "restricao_alimentar": { "type": "boolean" },
+                    "restricao_alimentar_qual": { "type": "string" },
+                    "limitacao": { "type": "boolean" },
+                    "limitacao_qual": { "type": "string" },
+                    "medicamento": { "type": "boolean" },
+                    "medicamento_qual": { "type": "string" },
+                    "medicamento_dosagem": { "type": "string" },
+                    "problema_saude": { "type": "boolean" },
+                    "problema_saude_qual": { "type": "string" }
+                }
+            },
+
+            "ParticipanteCadastro": {
+                "type": "object",
+                "required": [
+                    "nome",
+                    "email",
+                    "cpf",
+                    "data_nascimento",
+                    "rg",
+                    "data_expedicao_rg",
+                    "fone_celular",
+                    "fone_emergencia",
+                    "restricao_alimentar",
+                    "limitacao",
+                    "medicamento",
+                    "problema_saude",
+                    "password",
+                    "password_confirmation"
+                ],
+                "properties": {
+                    "nome": { "type": "string" },
+                    "email": { "type": "string" },
+                    "password": { "type": "string" },
+                    "password_confirmation": { "type": "string" },
+                    "cpf": { "type": "string" },
+                    "data_nascimento": { "type": "string", "format": "date" },
+                    "rg": { "type": "string" },
+                    "data_expedicao_rg": { "type": "string", "format": "date" },
+                    "fone_celular": { "type": "string" },
+                    "fone_emergencia": { "type": "string" },
+                    "restricao_alimentar": { "type": "boolean" },
+                    "restricao_alimentar_qual": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "limitacao": { "type": "boolean" },
+                    "limitacao_qual": { "type": "string", "nullable": true },
+                    "medicamento": { "type": "boolean" },
+                    "medicamento_qual": { "type": "string", "nullable": true },
+                    "medicamento_dosagem": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "problema_saude": { "type": "boolean" },
+                    "problema_saude_qual": {
+                        "type": "string",
+                        "nullable": true
+                    }
+                }
+            },
+
+            "Ponto": {
+                "type": "object",
+                "required": ["quantidade"],
+                "properties": {
+                    "quantidade": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 2000000
+                    },
+                    "descricao": {
+                        "type": "string"
+                    }
+                }
+            },
+
+            "PontoDetalhe": {
+                "type": "object",
+                "properties": {
+                    "id": { "type": "integer" },
+                    "quantidade": { "type": "number" },
+                    "tipo": {
+                        "type": "string",
+                        "enum": ["adicao", "subtracao"]
+                    },
+                    "descricao": { "type": "string" }
+                }
+            },
+
+            "Usuario": {
+                "type": "object",
+                "properties": {
+                    "nome": { "type": "string" },
+                    "email": { "type": "string" },
+                    "password": { "type": "string" },
+                    "ativo": { "type": "boolean" }
+                }
+            },
+
+            "Login": {
+                "type": "object",
+                "required": ["email", "password"],
+                "properties": {
+                    "email": { "type": "string" },
+                    "password": { "type": "string" }
+                }
+            }
+        }
+    },
+
+    "paths": {
+        "/login": {
+            "post": {
+                "tags": ["Auth"],
+                "summary": "Login do participante",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": { "$ref": "#/components/schemas/Login" }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": { "description": "Token JWT" }
+                }
+            }
+        },
+
+        "/logout": {
+            "post": {
+                "tags": ["Auth"],
+                "summary": "Logout do participante",
+                "security": [{ "bearerAuth": [] }],
+                "responses": {
+                    "200": { "description": "Logout realizado" }
+                }
+            }
+        },
+
+        "/manager/login": {
+            "post": {
+                "tags": ["Auth"],
+                "summary": "Login do manager",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": { "$ref": "#/components/schemas/Login" }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": { "description": "Token JWT" }
+                }
+            }
+        },
+
+        "/manager/logout": {
+            "post": {
+                "tags": ["Auth"],
+                "summary": "Logout do manager",
+                "security": [{ "bearerAuth": [] }],
+                "responses": {
+                    "200": { "description": "Logout realizado" }
+                }
+            }
+        },
+
+        "/cadastro/finalizar/{token}": {
+            "post": {
+                "tags": ["Cadastro"],
+                "summary": "Finalizar cadastro do participante convidado",
+                "parameters": [
+                    {
+                        "name": "token",
+                        "in": "path",
+                        "required": true,
+                        "schema": { "type": "integer" }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ParticipanteCadastro"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": { "description": "Cadastro realizado com sucesso." }
+                }
+            }
+        },
+
+        "/cadastro/usuario/{token}": {
+            "get": {
+                "tags": ["Cadastro"],
+                "summary": "Detalhar participante convidado",
+                "parameters": [
+                    {
+                        "name": "token",
+                        "in": "path",
+                        "required": true,
+                        "schema": { "type": "integer" }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Detalhe Participante Convidado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "usuario": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/PartipanteConvidadoDetalhe"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+
+        "/manager/edicoes": {
+            "get": {
+                "tags": ["Edicoes"],
+                "summary": "Listar edições",
+                "security": [{ "bearerAuth": [] }],
+                "responses": {
+                    "200": {
+                        "description": "Lista de Edições",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "edicoes": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/EdicaoDetalhe"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+
+        "/manager/edicoes/{id}": {
+            "get": {
+                "tags": ["Edicoes"],
+                "summary": "Detalhar edição",
+                "security": [{ "bearerAuth": [] }],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": { "type": "integer" }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Detalhe da edição",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "edicoes": {
+                                            "$ref": "#/components/schemas/EdicaoItem"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+
+        "/manager/edicoes/novo": {
+            "post": {
+                "tags": ["Edicoes"],
+                "summary": "Criar edição",
+                "security": [{ "bearerAuth": [] }],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EdicaoDetalhe"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Edição criada com sucesso."
+                    }
+                }
+            }
+        },
+
+        "/manager/edicoes/atualizar/{id}": {
+            "put": {
+                "tags": ["Edicoes"],
+                "summary": "Atualizar edição",
+                "security": [{ "bearerAuth": [] }],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": { "type": "integer" }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EdicaoDetalhe"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Edição atualizada com sucesso."
+                    }
+                }
+            }
+        },
+
+        "/manager/edicoes/visibilidade/{id}": {
+            "put": {
+                "tags": ["Edicoes"],
+                "summary": "Atualizar visibilidade da edição",
+                "security": [{ "bearerAuth": [] }],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": { "type": "integer" }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": ["visivel"],
+                                "properties": {
+                                    "visivel": { "type": "boolean" }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Visibilidade atualizada com sucesso."
+                    }
+                }
+            }
+        },
+
+        "/manager/edicoes/excluir/{id}": {
+            "delete": {
+                "tags": ["Edicoes"],
+                "summary": "Excluir edição",
+                "security": [{ "bearerAuth": [] }],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": { "type": "integer" }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Edição excluida com sucesso."
+                    }
+                }
+            }
+        },
+
+        "/manager/edicoes/{idEdicao}/fotos": {
+            "get": {
+                "tags": ["Fotos"],
+                "summary": "Listar fotos por edição",
+                "security": [{ "bearerAuth": [] }],
+                "parameters": [
+                    {
+                        "name": "idEdicao",
+                        "in": "path",
+                        "required": true,
+                        "schema": { "type": "integer" }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista de fotos",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "fotos": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/FotoItem"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+
+        "/manager/edicoes/fotos/{idFoto}": {
+            "get": {
+                "tags": ["Fotos"],
+                "summary": "Detalhar foto",
+                "security": [{ "bearerAuth": [] }],
+                "parameters": [
+                    {
+                        "name": "idFoto",
+                        "in": "path",
+                        "required": true,
+                        "schema": { "type": "integer" }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Detalhe da foto",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "foto": {
+                                            "$ref": "#/components/schemas/FotoItem"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+
+        "/manager/edicoes/{idEdicao}/fotos/novo": {
+            "post": {
+                "tags": ["Fotos"],
+                "summary": "Criar foto",
+                "security": [{ "bearerAuth": [] }],
+                "parameters": [
+                    {
+                        "name": "idEdicao",
+                        "in": "path",
+                        "required": true,
+                        "schema": { "type": "integer" }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "type": "object",
+                                "required": ["imagem"],
+                                "properties": {
+                                    "imagem": {
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Foto criada com sucesso"
+                    }
+                }
+            }
+        },
+
+        "/manager/edicoes/fotos/ordenar": {
+            "put": {
+                "tags": ["Fotos"],
+                "summary": "Atualizar ordem das fotos",
+                "security": [{ "bearerAuth": [] }],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "required": ["id", "ordem"],
+                                    "properties": {
+                                        "id": { "type": "integer" },
+                                        "ordem": { "type": "integer" }
+                                    }
+                                }
+                            },
+                            "example": [
+                                { "id": 1, "ordem": 1 },
+                                { "id": 2, "ordem": 2 }
+                            ]
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Ordem atualizada com sucesso"
+                    }
+                }
+            }
+        },
+
+        "/manager/edicoes/fotos/visibilidade/{idFoto}": {
+            "put": {
+                "tags": ["Fotos"],
+                "summary": "Atualizar visibilidade da foto",
+                "security": [{ "bearerAuth": [] }],
+                "parameters": [
+                    {
+                        "name": "idFoto",
+                        "in": "path",
+                        "required": true,
+                        "schema": { "type": "integer" }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": ["visivel"],
+                                "properties": {
+                                    "visivel": { "type": "boolean" }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Visibilidade atualizada com sucesso"
+                    }
+                }
+            }
+        },
+
+        "/manager/edicoes/fotos/excluir/{idFoto}": {
+            "delete": {
+                "tags": ["Fotos"],
+                "summary": "Excluir foto",
+                "security": [{ "bearerAuth": [] }],
+                "parameters": [
+                    {
+                        "name": "idFoto",
+                        "in": "path",
+                        "required": true,
+                        "schema": { "type": "integer" }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Foto excluída com sucesso"
+                    }
+                }
+            }
+        },
+
+        "/manager/participantes": {
+            "get": {
+                "tags": ["Participantes"],
+                "summary": "Listar participantes",
+                "security": [{ "bearerAuth": [] }],
+                "responses": {
+                    "200": {
+                        "description": "Listar de participantes",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "participantes": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/ParticipanteListItem"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+
+        "/manager/participantes/{id}": {
+            "get": {
+                "tags": ["Participantes"],
+                "summary": "Detalhar participante",
+                "security": [{ "bearerAuth": [] }],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": { "type": "integer" }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Detalhe do participante",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "participante": {
+                                            "$ref": "#/components/schemas/ParticipanteDetalhe"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+
+        "/manager/participantes/atualizar/{id}": {
+            "post": {
+                "tags": ["Participantes"],
+                "summary": "Atualizar participante",
+                "security": [{ "bearerAuth": [] }],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": { "type": "integer" }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ParticipanteUpdate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Atualizado com sucesso"
+                    }
+                }
+            }
+        },
+
+        "/manager/participantes/convidar": {
+            "post": {
+                "tags": ["Participantes"],
+                "summary": "Convidar participante",
+                "security": [{ "bearerAuth": [] }],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": ["email"],
+                                "properties": {
+                                    "nome": { "type": "string" },
+                                    "email": { "type": "string" }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Convite enviado"
+                    }
+                }
+            }
+        },
+
+        "/manager/participantes/excluir/{ids}": {
+            "delete": {
+                "tags": ["Participantes"],
+                "summary": "Excluir participantes",
+                "security": [{ "bearerAuth": [] }],
+                "parameters": [
+                    {
+                        "name": "ids",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1,2,3"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Excluídos"
+                    }
+                }
+            }
+        },
+
+        "/manager/participantes/ativar/{ids}": {
+            "post": {
+                "tags": ["Participantes"],
+                "summary": "Ativar participantes",
+                "security": [{ "bearerAuth": [] }],
+                "parameters": [
+                    {
+                        "name": "ids",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1,2"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": { "description": "Ativados" }
+                }
+            }
+        },
+
+        "/manager/participantes/desativar/{ids}": {
+            "post": {
+                "tags": ["Participantes"],
+                "summary": "Desativar participantes",
+                "security": [{ "bearerAuth": [] }],
+                "parameters": [
+                    {
+                        "name": "ids",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "1,2"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": { "description": "Desativados" }
+                }
+            }
+        },
+
+        "/manager/participantes/pontos/novo/{id}/{tipo}": {
+            "post": {
+                "tags": ["Pontos"],
+                "summary": "Criar pontuação",
+                "security": [{ "bearerAuth": [] }],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": { "type": "integer" }
+                    },
+                    {
+                        "name": "tipo",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "enum": ["adicao", "subtracao"]
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": { "$ref": "#/components/schemas/Ponto" }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": { "description": "Criado" }
+                }
+            }
+        },
+
+        "/manager/participantes/pontos/atualizar/{id}": {
+            "post": {
+                "tags": ["Pontos"],
+                "summary": "Atualizar pontuação",
+                "security": [{ "bearerAuth": [] }],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": { "type": "integer" }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": { "$ref": "#/components/schemas/Ponto" }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": { "description": "Atualizado" }
+                }
+            }
+        },
+
+        "/manager/participantes/pontos/{ids}": {
+            "delete": {
+                "tags": ["Pontos"],
+                "summary": "Excluir pontuações",
+                "security": [{ "bearerAuth": [] }],
+                "parameters": [
+                    {
+                        "name": "ids",
+                        "in": "path",
+                        "required": true,
+                        "schema": { "type": "string", "example": "10,11" }
+                    }
+                ],
+                "responses": {
+                    "201": { "description": "Excluídas" }
+                }
+            }
+        },
+        "/manager/usuarios": {
+            "get": {
+                "tags": ["Usuários"],
+                "summary": "Listar administradores",
+                "security": [{ "bearerAuth": [] }],
+                "responses": {
+                    "200": { "description": "Listar" }
+                }
+            }
+        },
+
+        "/manager/usuarios/{id}": {
+            "get": {
+                "tags": ["Usuários"],
+                "summary": "Detalhar usuário",
+                "security": [{ "bearerAuth": [] }],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": { "type": "integer" }
+                    }
+                ],
+                "responses": {
+                    "200": { "description": "Detalhe" }
+                }
+            }
+        },
+
+        "/manager/usuarios/novo": {
+            "post": {
+                "tags": ["Usuários"],
+                "summary": "Criar usuário",
+                "security": [{ "bearerAuth": [] }],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": { "$ref": "#/components/schemas/Usuario" }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": { "description": "Criado" }
+                }
+            }
+        },
+
+        "/manager/usuarios/atualizar/{id}": {
+            "post": {
+                "tags": ["Usuários"],
+                "summary": "Atualizar usuário",
+                "security": [{ "bearerAuth": [] }],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": { "type": "integer" }
+                    }
+                ],
+                "responses": {
+                    "201": { "description": "Atualizado" }
+                }
+            }
+        },
+
+        "/manager/usuarios/excluir/{ids}": {
+            "delete": {
+                "tags": ["Usuários"],
+                "summary": "Excluir usuários",
+                "security": [{ "bearerAuth": [] }],
+                "parameters": [
+                    {
+                        "name": "ids",
+                        "in": "path",
+                        "required": true,
+                        "schema": { "type": "string" }
+                    }
+                ],
+                "responses": {
+                    "200": { "description": "Excluídos" }
+                }
+            }
+        },
+
+        "/painel/usuario": {
+            "get": {
+                "tags": ["Painel"],
+                "summary": "Listar detalhes do participante autenticado",
+                "security": [{ "bearerAuth": [] }],
+                "responses": {
+                    "200": {
+                        "description": "Lista detalhes do participante autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UsuarioItem"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+
+        "/painel/usuario/atualizar": {
+            "put": {
+                "tags": ["Painel"],
+                "summary": "Atualizar participante autenticado",
+                "security": [{ "bearerAuth": [] }],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ParticipanteCadastro"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Cadastro atualizado com sucesso."
+                    }
+                }
+            }
+        },
+
+        "/painel/ranking": {
+            "get": {
+                "tags": ["Painel"],
+                "summary": "Listar os 5 rankings em volta do participante autenticado",
+                "security": [{ "bearerAuth": [] }],
+                "responses": {
+                    "200": {
+                        "description": "Lista de Rankings",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "ranking": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/RankingItem"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
