@@ -58,7 +58,13 @@ class ImagemService
             $this->compressor->compactarOuReverter($arquivo->getRealPath(), base_path('../media/content/editions/thumbs/imagem/' . $imagem));
 
             return [
-                'foto' => $foto
+                'foto' => [
+                    'id' => $foto->id,
+                    'ordem' => $foto->ordem,
+                    'imagem' => $foto->imagem,
+                    'visivel' => $foto->visivel ? true : false,
+                    'edicao_id' => $foto->edicao_id
+                ]
             ];
         } catch (\Exception $e) {
             DB::rollBack();
@@ -125,7 +131,15 @@ class ImagemService
 
             DB::commit();
 
-            return  $foto;
+            return [
+                'foto' => [
+                    'id' => $foto->id,
+                    'ordem' => $foto->ordem,
+                    'imagem' => $foto->imagem,
+                    'visivel' => $foto->visivel ? true : false,
+                    'edicao_id' => $foto->edicao_id
+                ]
+            ];
         } catch (\Exception $e) {
             DB::rollBack();
             throw new \Exception($e->getMessage());

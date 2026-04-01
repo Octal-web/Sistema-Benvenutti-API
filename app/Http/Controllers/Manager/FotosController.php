@@ -55,7 +55,7 @@ class FotosController extends Controller
             'id' => $foto->id,
             'img' => config('services.site_storage') . '/media/content/editions/thumbs/imagem/' . $foto->imagem,
             'ordem' => $foto->ordem,
-            'visivel' => $foto->visivel,
+            'visivel' => $foto->visivel ? true : false,
             'edicao_id' => $foto->edicao_id
         ];
 
