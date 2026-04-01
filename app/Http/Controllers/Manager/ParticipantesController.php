@@ -6,21 +6,22 @@ use App\Http\Controllers\Controller;
 
 use App\Models\Usuario;
 
-use App\Services\MemberService;
+use App\Services\ParticipanteService;
 
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
 class ParticipantesController extends Controller
 {
-    protected $memberService;
+    protected $participanteService;
 
-    public function __construct(MemberService $memberService)
+    public function __construct(ParticipanteService $participanteService)
     {
-        $this->memberService = $memberService;
+        $this->participanteService = $participanteService;
     }
 
-    public function getParticipantes() {
+    public function getParticipantes()
+    {
         $participantes = Usuario::query()
             ->where([
                 'excluido' => NULL,
@@ -29,13 +30,13 @@ class ParticipantesController extends Controller
             ->with([
                 'participante' => function ($q) {
                     $q->where('excluido', NULL)
-                      ->with(['pontos' => function ($query) {
-                        $query->where('excluido', NULL);
-                      }]);
+                        ->with(['pontos' => function ($query) {
+                            $query->where('excluido', NULL);
+                        }]);
                 },
                 'logs' => function ($q) {
                     $q->latest('criado')
-                    ->take(1);
+                        ->take(1);
                 },
             ])
             ->get()
@@ -77,7 +78,8 @@ class ParticipantesController extends Controller
         ]);
     }
 
-    public function inviteParticipante(Request $request) {
+    public function inviteParticipante(Request $request)
+    {
         $this->validate($request, [
             'nome' => 'nullable',
             'email' => 'required|email|unique:usuarios,email|max:255',
@@ -90,7 +92,7 @@ class ParticipantesController extends Controller
         $dadosConvidado = $request->only(['nome', 'email']);
 
         try {
-            $response = $this->memberService->convidarParticipante($dadosConvidado);
+            $response = $this->participanteService->convidarParticipante($dadosConvidado);
 
             return response()->json([
                 'success' => true,
@@ -112,7 +114,8 @@ class ParticipantesController extends Controller
         }
     }
 
-    public function getParticipante($id) {
+    public function getParticipante($id)
+    {
         $participante = Usuario::query()
             ->where([
                 'excluido' => NULL,
@@ -121,10 +124,10 @@ class ParticipantesController extends Controller
             ])
             ->with(['participante' => function ($q) {
                 $q->where('excluido', NULL)
-                  ->with(['pontos' => function ($query) {
+                    ->with(['pontos' => function ($query) {
                         $query->where('excluido', NULL)
-                              ->orderBy('criado', 'ASC');
-                  }]);
+                            ->orderBy('criado', 'ASC');
+                    }]);
             }])
             ->first();
 
@@ -142,9 +145,9 @@ class ParticipantesController extends Controller
             ->with([
                 'participante' => function ($q) {
                     $q->where('excluido', NULL)
-                    ->with(['pontos' => function ($query) {
-                        $query->where('excluido', NULL);
-                    }]);
+                        ->with(['pontos' => function ($query) {
+                            $query->where('excluido', NULL);
+                        }]);
                 }
             ])
             ->get()
@@ -226,7 +229,8 @@ class ParticipantesController extends Controller
         ]);
     }
 
-    public function updateParticipante(Request $request, $id) {
+    public function updateParticipante(Request $request, $id)
+    {
         $participante = Usuario::query()
             ->where([
                 'id' => $id,
@@ -244,7 +248,7 @@ class ParticipantesController extends Controller
                 'error' => 'Participante não encontrado.'
             ], 404);
         }
-        
+
         $this->validate($request, [
             'nome' => 'required|string|max:255',
             'email' => 'required|email|unique:usuarios,email,' . $participante->id,
@@ -305,9 +309,9 @@ class ParticipantesController extends Controller
 
         $dadosUsuario = $request->only(['nome', 'email', 'password', 'ativo']);
         $dadosParticipante = $request->only(['cpf', 'data_nascimento', 'rg', 'data_expedicao_rg', 'fone_celular', 'fone_emergencia', 'restricao_alimentar', 'restricao_alimentar_qual', 'limitacao', 'limitacao_qual', 'medicamento', 'medicamento_qual', 'medicamento_dosagem', 'problema_saude', 'problema_saude_qual']);
-        
+
         try {
-            $response = $this->memberService->atualizarParticipante($dadosUsuario, $dadosParticipante, $id);
+            $response = $this->participanteService->atualizarParticipante($dadosUsuario, $dadosParticipante, $id);
 
             return response()->json([
                 'success' => true,
@@ -334,7 +338,7 @@ class ParticipantesController extends Controller
         $explodeIds = explode(',', $ids);
 
         try {
-            $response = $this->memberService->excluirParticipantes($explodeIds);
+            $response = $this->participanteService->excluirParticipantes($explodeIds);
 
             return response()->json([
                 'success' => true,
@@ -361,7 +365,7 @@ class ParticipantesController extends Controller
         $explodeIds = explode(',', $ids);
 
         try {
-            $response = $this->memberService->ativarParticipantes($explodeIds);
+            $response = $this->participanteService->ativarParticipantes($explodeIds);
 
             return response()->json([
                 'success' => true,
@@ -388,7 +392,7 @@ class ParticipantesController extends Controller
         $explodeIds = explode(',', $ids);
 
         try {
-            $response = $this->memberService->desativarParticipantes($explodeIds);
+            $response = $this->participanteService->desativarParticipantes($explodeIds);
 
             return response()->json([
                 'success' => true,
