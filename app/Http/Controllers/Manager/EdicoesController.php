@@ -50,6 +50,12 @@ class EdicoesController extends Controller
             ])
             ->first();
 
+        if (!$edicao) {
+            return response()->json([
+                'message' => 'Edição não encontrada',
+            ], 404);
+        }
+
         $edicaoData = [
             'id' => $edicao->id,
             'destino' => $edicao->destino,

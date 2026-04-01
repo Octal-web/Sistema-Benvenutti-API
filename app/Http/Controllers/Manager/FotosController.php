@@ -51,6 +51,12 @@ class FotosController extends Controller
                 'excluido' => NULL,
             ])->first();
 
+        if (!$foto) {
+            return response()->json([
+                'message' => 'Foto não encontrada',
+            ], 404);
+        }
+
         $fotoData = [
             'id' => $foto->id,
             'imagem' => config('services.site_storage') . '/media/content/editions/thumbs/imagem/' . $foto->imagem,
