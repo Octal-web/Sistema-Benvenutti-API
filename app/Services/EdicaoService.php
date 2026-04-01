@@ -13,10 +13,17 @@ class EdicaoService
         DB::beginTransaction();
 
         try {
+            $ultimaOrdem = Edicao::query()
+                ->whereNull('excluido')
+                ->max('ordem');
+
+            $ordem = $ultimaOrdem ? $ultimaOrdem + 1 : 1;
+
             $edicao = Edicao::create([
                 'destino' => $request['destino'],
                 'ano' => $request['ano'],
-                'visivel' => true
+                'visivel' => true,
+                'ordem' => $ordem
             ]);
 
             DB::commit();
@@ -26,6 +33,7 @@ class EdicaoService
                     'id' => $edicao->id,
                     'destino' => $edicao->destino,
                     'ano' => $edicao->ano,
+                    'ordem' => $ordem,
                     'visivel' => $edicao->visivel ? true : false,
                 ],
             ];
@@ -94,8 +102,46 @@ class EdicaoService
                     'id' => $edicao->id,
                     'destino' => $edicao->destino,
                     'ano' => $edicao->ano,
+                    'ordem' => $edicao->ordem,
                     'visivel' => $edicao->visivel ? true : false,
                 ]
+            ];
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw new \Exception($e->getMessage());
+        }
+    }
+
+    public function atualizarOrdem($request)
+    {
+        DB::beginTransaction();
+
+        try {
+            foreach ($request as $odr) {
+                if (!isset($odr['id']) || !isset($odr['ordem'])) {
+                    throw new \Exception('O formato do request está inválido. É necessário um campo id e ordem.');
+                }
+
+                $edicao = Edicao::query()
+                    ->where([
+                        'excluido' => NULL,
+                        'id' => $odr['id']
+                    ])
+                    ->first();
+
+                if (!$edicao) {
+                    throw new \Exception("Registro com ID {$odr['id']} não encontrado!");
+                }
+
+                $edicao->update([
+                    'ordem' => $odr['ordem'],
+                ]);
+            }
+
+            DB::commit();
+
+            return [
+                'edicoes' => 'Ordem atualizada com sucesso!',
             ];
         } catch (\Exception $e) {
             DB::rollBack();
