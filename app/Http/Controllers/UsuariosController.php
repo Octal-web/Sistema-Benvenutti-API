@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Log;
 use App\Models\Usuario;
-use App\Services\UserService;
+use App\Services\UsuarioService;
 use Carbon\Carbon;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
@@ -13,11 +13,11 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 
 class UsuariosController extends Controller
 {
-    protected $userService;
+    protected $usuarioService;
 
-    public function __construct(UserService $userService)
+    public function __construct(UsuarioService $usuarioService)
     {
-        $this->userService = $userService;
+        $this->usuarioService = $usuarioService;
     }
 
     public function login(Request $request)
@@ -227,7 +227,7 @@ class UsuariosController extends Controller
         $dadosParticipante = $request->only(['cpf', 'data_nascimento', 'rg', 'data_expedicao_rg', 'fone_celular', 'fone_emergencia', 'restricao_alimentar', 'restricao_alimentar_qual', 'limitacao', 'limitacao_qual', 'medicamento', 'medicamento_qual', 'medicamento_dosagem', 'problema_saude', 'problema_saude_qual']);
 
         try {
-            $response = $this->userService->atualizarCadastro($usuario, $dadosUsuario, $dadosParticipante);
+            $response = $this->usuarioService->atualizarCadastro($usuario, $dadosUsuario, $dadosParticipante);
 
             return response()->json([
                 'success' => true,
