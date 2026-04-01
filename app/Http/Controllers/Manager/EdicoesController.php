@@ -30,6 +30,7 @@ class EdicoesController extends Controller
                 return [
                     'id' => $edicao->id,
                     'nome' => $edicao->destino . '-' . $edicao->ano,
+                    'visivel' => $edicao->visivel ? true : false,
                 ];
             });
 
@@ -51,7 +52,8 @@ class EdicoesController extends Controller
         $edicaoData = [
             'id' => $edicao->id,
             'destino' => $edicao->destino,
-            'ano' => $edicao->ano
+            'ano' => $edicao->ano,
+            'visivel' => $edicao->visivel ? true : false,
         ];
 
         return response()->json([
@@ -130,6 +132,41 @@ class EdicoesController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erro ao atualizar edicao',
+                'error' => $e->getMessage(),
+            ], 500);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro inesperado ao processar a solicitação.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+
+    public function visibleEdicao(Request $request, $id)
+    {
+        $this->validate($request, [
+            'visivel' => 'required|boolean',
+        ], [
+            'visivel.required' => 'Por favor, informe a visibilidade da edição.',
+            'visivel.boolean' => 'A visibilidade da edição é um valor inválido!'
+        ]);
+
+        $dados = $request->only(['visivel']);
+
+        try {
+            $response = $this->edicaoService->atualizarVisibilidade($dados, $id);
+
+            return response()->json([
+                'success' => true,
+                'data' => $response,
+                'message' => 'Visibilidade alterada com sucesso.'
+            ], 200);
+        } catch (QueryException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro ao alterar a visibilidade da edição.',
                 'error' => $e->getMessage(),
             ], 500);
         } catch (\Exception $e) {
