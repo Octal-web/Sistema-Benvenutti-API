@@ -23,7 +23,7 @@ class EdicoesController extends Controller
             ->where([
                 'excluido' => NULL,
             ])
-            ->orderBy('ano', 'DESC')
+            ->orderBy('ordem', 'ASC')
             ->orderBy('id', 'DESC')
             ->get()
             ->map(function ($edicao) {
@@ -31,6 +31,7 @@ class EdicoesController extends Controller
                     'id' => $edicao->id,
                     'nome' => $edicao->destino . '-' . $edicao->ano,
                     'visivel' => $edicao->visivel ? true : false,
+                    'ordem' => $edicao->ordem
                 ];
             });
 
@@ -54,6 +55,7 @@ class EdicoesController extends Controller
             'destino' => $edicao->destino,
             'ano' => $edicao->ano,
             'visivel' => $edicao->visivel ? true : false,
+            'ordem' => $edicao->ordem
         ];
 
         return response()->json([
@@ -167,6 +169,40 @@ class EdicoesController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erro ao alterar a visibilidade da edição.',
+                'error' => $e->getMessage(),
+            ], 500);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro inesperado ao processar a solicitação.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function orderEdicao(Request $request)
+    {
+        $this->validate($request, [
+            '*.id' => 'required|integer',
+            '*.ordem' => 'required|integer',
+        ], [
+            'ordem.required' => 'Por favor, informe a ordem da edição.',
+            'ordem.integer' => 'A ordem da edição é um valor inválido!'
+        ]);
+
+        $dados = $request->all();
+
+        try {
+            $response = $this->edicaoService->atualizarOrdem($dados);
+
+            return response()->json([
+                'success' => true,
+                'data' => $response,
+            ], 200);
+        } catch (QueryException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro ao alterar a ordem das edições.',
                 'error' => $e->getMessage(),
             ], 500);
         } catch (\Exception $e) {
