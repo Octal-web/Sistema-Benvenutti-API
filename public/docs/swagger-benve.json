@@ -559,15 +559,32 @@
                                     "type": "object",
                                     "required": ["id", "ordem"],
                                     "properties": {
-                                        "id": { "type": "integer" },
-                                        "ordem": { "type": "integer" }
+                                        "ordem": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "required": ["id", "ordem"],
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 3
+                                                    },
+                                                    "ordem": {
+                                                        "type": "integer",
+                                                        "example": 0
+                                                    }
+                                                }
+                                            }
+                                        }
                                     }
                                 }
                             },
-                            "example": [
-                                { "id": 1, "ordem": 1 },
-                                { "id": 2, "ordem": 2 }
-                            ]
+                            "example": {
+                                "ordem": [
+                                    { "id": 3, "ordem": 0 },
+                                    { "id": 6, "ordem": 1 }
+                                ]
+                            }
                         }
                     }
                 },
@@ -722,15 +739,32 @@
                                     "type": "object",
                                     "required": ["id", "ordem"],
                                     "properties": {
-                                        "id": { "type": "integer" },
-                                        "ordem": { "type": "integer" }
+                                        "ordem": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "required": ["id", "ordem"],
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 3
+                                                    },
+                                                    "ordem": {
+                                                        "type": "integer",
+                                                        "example": 0
+                                                    }
+                                                }
+                                            }
+                                        }
                                     }
                                 }
                             },
-                            "example": [
-                                { "id": 1, "ordem": 1 },
-                                { "id": 2, "ordem": 2 }
-                            ]
+                            "example": {
+                                "ordem": [
+                                    { "id": 3, "ordem": 0 },
+                                    { "id": 6, "ordem": 1 }
+                                ]
+                            }
                         }
                     }
                 },
