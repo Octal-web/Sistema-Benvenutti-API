@@ -15,7 +15,8 @@ class EdicaoService
         try {
             $edicao = Edicao::create([
                 'destino' => $request['destino'],
-                'ano' => $request['ano']
+                'ano' => $request['ano'],
+                'visivel' => true
             ]);
 
             DB::commit();
@@ -24,7 +25,8 @@ class EdicaoService
                 'edicao' => [
                     'id' => $edicao->id,
                     'destino' => $edicao->destino,
-                    'ano' => $edicao->ano
+                    'ano' => $edicao->ano,
+                    'visivel' => $edicao->visivel ? true : false,
                 ],
             ];
         } catch (\Exception $e) {
@@ -58,6 +60,42 @@ class EdicaoService
 
             return [
                 'edicao' => $edicao,
+            ];
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw new \Exception($e->getMessage());
+        }
+    }
+
+    public function atualizarVisibilidade($request, $id)
+    {
+        DB::beginTransaction();
+
+        try {
+            $edicao = Edicao::query()
+                ->where([
+                    'excluido' => NULL,
+                    'id' => $id,
+                ])
+                ->first();
+
+            if (!$edicao) {
+                throw new \Exception('Edição não encontrada!');
+            }
+
+            $edicao->update([
+                'visivel' => $request['visivel'],
+            ]);
+
+            DB::commit();
+
+            return [
+                'edicao' => [
+                    'id' => $edicao->id,
+                    'destino' => $edicao->destino,
+                    'ano' => $edicao->ano,
+                    'visivel' => $edicao->visivel ? true : false,
+                ]
             ];
         } catch (\Exception $e) {
             DB::rollBack();
