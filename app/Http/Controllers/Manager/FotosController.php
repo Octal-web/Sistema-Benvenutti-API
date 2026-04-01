@@ -31,7 +31,7 @@ class FotosController extends Controller
             ->map(function ($foto) {
                 return [
                     'id' => $foto->id,
-                    'img' => config('services.site_storage') . '/media/content/editions/thumbs/imagem/' . $foto->imagem,
+                    'imagem' => config('services.site_storage') . '/media/content/editions/thumbs/imagem/' . $foto->imagem,
                     'ordem' => $foto->ordem,
                     'visivel' => $foto->visivel ? true : false,
                     'edicao_id' => $foto->edicao_id
@@ -53,7 +53,7 @@ class FotosController extends Controller
 
         $fotoData = [
             'id' => $foto->id,
-            'img' => config('services.site_storage') . '/media/content/editions/thumbs/imagem/' . $foto->imagem,
+            'imagem' => config('services.site_storage') . '/media/content/editions/thumbs/imagem/' . $foto->imagem,
             'ordem' => $foto->ordem,
             'visivel' => $foto->visivel ? true : false,
             'edicao_id' => $foto->edicao_id

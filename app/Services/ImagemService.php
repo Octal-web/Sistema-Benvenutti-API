@@ -61,7 +61,7 @@ class ImagemService
                 'foto' => [
                     'id' => $foto->id,
                     'ordem' => $foto->ordem,
-                    'imagem' => $foto->imagem,
+                    'img' => $foto->imagem,
                     'visivel' => $foto->visivel ? true : false,
                     'edicao_id' => $foto->edicao_id
                 ]
