@@ -6,32 +6,36 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
-use App\Services\PasswordService;
+use App\Services\SenhaService;
 
 use App\Models\Token;
 
 class SenhaController extends Controller
 {
-    protected $passwordService;
+    protected $senhaService;
 
-    public function __construct(PasswordService $passwordService)
+    public function __construct(SenhaService $senhaService)
     {
-        $this->passwordService = $passwordService;
+        $this->senhaService = $senhaService;
     }
 
-    public function resetSenha(Request $request) {
-        $this->validate($request, [
-            'email' => 'required|email',
-        ],
-        [
-            'email.required' => 'Por favor, informe o seu e-mail.',
-            'email.email' => 'Por favor, informe um e-mail válido.',
-        ]);
+    public function resetSenha(Request $request)
+    {
+        $this->validate(
+            $request,
+            [
+                'email' => 'required|email',
+            ],
+            [
+                'email.required' => 'Por favor, informe o seu e-mail.',
+                'email.email' => 'Por favor, informe um e-mail válido.',
+            ]
+        );
 
         $dadosUsuario = $request->only(['email']);
 
         try {
-            $response = $this->passwordService->solicitarSenha($dadosUsuario);
+            $response = $this->senhaService->solicitarSenha($dadosUsuario);
 
             return response()->json([
                 'success' => true,
@@ -53,7 +57,8 @@ class SenhaController extends Controller
         }
     }
 
-    public function getToken($token) {
+    public function getToken($token)
+    {
         $token = Token::query()
             ->where([
                 'utilizado' => NULL,
@@ -67,23 +72,27 @@ class SenhaController extends Controller
         ]);
     }
 
-    public function updateSenha(Request $request, $token) {
-        $this->validate($request, [
-            'password' => 'required|string|min:8|confirmed',
-            'password_confirmation' => 'required|string|min:8',
-        ],
-        [
-            'password.required' => 'A senha é obrigatória.',
-            'password.min' => 'A senha deve ter pelo menos 8 caracteres.',
-            'password.confirmed' => 'As senhas não correspondem.',
-            'password_confirmation.required' => 'A confirmação da senha é obrigatória.',
-            'password_confirmation.min' => 'A confirmação da senha deve ter pelo menos 8 caracteres.',
-        ]);
-        
+    public function updateSenha(Request $request, $token)
+    {
+        $this->validate(
+            $request,
+            [
+                'password' => 'required|string|min:8|confirmed',
+                'password_confirmation' => 'required|string|min:8',
+            ],
+            [
+                'password.required' => 'A senha é obrigatória.',
+                'password.min' => 'A senha deve ter pelo menos 8 caracteres.',
+                'password.confirmed' => 'As senhas não correspondem.',
+                'password_confirmation.required' => 'A confirmação da senha é obrigatória.',
+                'password_confirmation.min' => 'A confirmação da senha deve ter pelo menos 8 caracteres.',
+            ]
+        );
+
         $dadosSenha = $request->only(['password']);
 
         try {
-            $response = $this->passwordService->atualizarSenha($dadosSenha, $token);
+            $response = $this->senhaService->atualizarSenha($dadosSenha, $token);
 
             return response()->json([
                 'success' => true,
