@@ -110,14 +110,17 @@ class FotosController extends Controller
     public function orderFoto(Request $request)
     {
         $this->validate($request, [
-            '*.id' => 'required|integer',
-            '*.ordem' => 'required|integer',
+            'ordem' => 'required|array',
+            'ordem.*.id' => 'required|integer',
+            'ordem.*.ordem' => 'required|integer',
         ], [
-            'ordem.required' => 'Por favor, informe a ordem da foto.',
-            'ordem.integer' => 'A ordem da imagem é um valor inválido!'
+            'ordem.required' => 'Por favor, informe a lista de ordens.',
+            'ordem.array' => 'O formato está inválido.',
+            'ordem.*.id.required' => 'Por favor, informe a ordem das fotos.',
+            'ordem.*.ordem.required' => 'A ordem das fotos é um valor inválido!'
         ]);
 
-        $dados = $request->all();
+        $dados = $request->input('ordem', []);
 
         try {
             $response = $this->imagemService->atualizarOrdem($dados);
