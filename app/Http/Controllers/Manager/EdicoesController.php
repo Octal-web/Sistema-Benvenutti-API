@@ -189,17 +189,17 @@ class EdicoesController extends Controller
     public function orderEdicao(Request $request)
     {
         $this->validate($request, [
-            'ordem' => 'required|array',
-            'ordem.*.id' => 'required|integer',
-            'ordem.*.ordem' => 'required|integer',
+            'odr' => 'required|array',
+            'odr.*.id' => 'required|integer',
+            'odr.*.ordem' => 'required|integer',
         ], [
-            'ordem.required' => 'Por favor, informe a lista de ordens.',
-            'ordem.array' => 'O formato está inválido.',
-            'ordem.*.id.required' => 'Por favor, informe a ordem da edições.',
-            'ordem.*.ordem.required' => 'A ordem da edições é um valor inválido!'
+            'odr.required' => 'Por favor, informe a lista de ordens.',
+            'odr.array' => 'O formato está inválido.',
+            'odr.*.id.required' => 'Por favor, informe a ordem da edições.',
+            'odr.*.ordem.required' => 'A ordem da edições é um valor inválido!'
         ]);
 
-        $dados = $request->input('ordem', []);
+        $dados = $request->input('odr', []);
 
         try {
             $response = $this->edicaoService->atualizarOrdem($dados);
