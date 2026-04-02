@@ -35,6 +35,10 @@ class FotosController extends Controller
             ])
             ->first();
 
+        if (!$edicao) {
+            return response()->json(['message' => 'Edição não encontrada'], 404);
+        }
+
         $edicaoData = [
             'id' => $edicao->id,
             'nome' => $edicao->nome,
@@ -43,8 +47,7 @@ class FotosController extends Controller
                     'id' => $foto->id,
                     'imagem' => config('services.site.storage') . '/content/editions/thumbs/' . $foto->imagem,
                     'ordem' => $foto->ordem,
-                    'visivel' => (bool) $foto->visivel,
-                    'edicao_id' => $foto->edicao_id,
+                    'visivel' => (bool) $foto->visivel
                 ];
             })->values()->all(),
         ];
@@ -70,7 +73,7 @@ class FotosController extends Controller
             'id' => $foto->id,
             'imagem' => config('services.site.storage') . '/content/editions/thumbs/' . $foto->imagem,
             'ordem' => $foto->ordem,
-            'visivel' => $foto->visivel ? true : false,
+            'visivel' => (bool) $foto->visivel,
             'edicao_id' => $foto->edicao_id
         ];
 
