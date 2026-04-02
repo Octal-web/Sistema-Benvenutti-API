@@ -41,7 +41,7 @@ class FotosController extends Controller
 
         $edicaoData = [
             'id' => $edicao->id,
-            'nome' => $edicao->nome,
+            'nome' => $edicao->destino,
             'fotos' => $edicao->fotos->map(function ($foto) {
                 return [
                     'id' => $foto->id,
