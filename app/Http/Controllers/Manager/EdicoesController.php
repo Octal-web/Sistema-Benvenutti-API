@@ -29,7 +29,7 @@ class EdicoesController extends Controller
             ->map(function ($edicao) {
                 return [
                     'id' => $edicao->id,
-                    'nome' => $edicao->destino . '-' . $edicao->ano,
+                    'nome' => $edicao->destino . ' - ' . $edicao->ano,
                     'visivel' => (bool) $edicao->visivel,
                     'ordem' => $edicao->ordem
                 ];
