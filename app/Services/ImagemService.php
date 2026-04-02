@@ -62,7 +62,7 @@ class ImagemService
                     'id' => $foto->id,
                     'ordem' => $foto->ordem,
                     'img' => $foto->imagem,
-                    'visivel' => $foto->visivel ? true : false,
+                    'visivel' => (bool) $foto->visivel,
                     'edicao_id' => $foto->edicao_id
                 ]
             ];
@@ -136,7 +136,7 @@ class ImagemService
                     'id' => $foto->id,
                     'ordem' => $foto->ordem,
                     'imagem' => $foto->imagem,
-                    'visivel' => $foto->visivel ? true : false,
+                    'visivel' => (bool) $foto->visivel,
                     'edicao_id' => $foto->edicao_id
                 ]
             ];

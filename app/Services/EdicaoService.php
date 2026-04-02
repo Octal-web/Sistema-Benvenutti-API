@@ -34,7 +34,7 @@ class EdicaoService
                     'destino' => $edicao->destino,
                     'ano' => $edicao->ano,
                     'ordem' => $ordem,
-                    'visivel' => $edicao->visivel ? true : false,
+                    'visivel' => (bool) $edicao->visivel,
                 ],
             ];
         } catch (\Exception $e) {
@@ -103,7 +103,7 @@ class EdicaoService
                     'destino' => $edicao->destino,
                     'ano' => $edicao->ano,
                     'ordem' => $edicao->ordem,
-                    'visivel' => $edicao->visivel ? true : false,
+                    'visivel' => (bool) $edicao->visivel,
                 ]
             ];
         } catch (\Exception $e) {

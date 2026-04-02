@@ -30,7 +30,7 @@ class EdicoesController extends Controller
                 return [
                     'id' => $edicao->id,
                     'nome' => $edicao->destino . '-' . $edicao->ano,
-                    'visivel' => $edicao->visivel ? true : false,
+                    'visivel' => (bool) $edicao->visivel,
                     'ordem' => $edicao->ordem
                 ];
             });
@@ -60,7 +60,7 @@ class EdicoesController extends Controller
             'id' => $edicao->id,
             'destino' => $edicao->destino,
             'ano' => $edicao->ano,
-            'visivel' => $edicao->visivel ? true : false,
+            'visivel' => (bool) $edicao->visivel,
             'ordem' => $edicao->ordem
         ];
 
