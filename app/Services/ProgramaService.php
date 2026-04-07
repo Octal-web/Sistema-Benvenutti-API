@@ -20,6 +20,7 @@ class ProgramaService
                     'descricao' => $dados['descricao'],
                     'data_inicio' => Carbon::createFromFormat('d-m-Y H:i', $dados['data_inicio']),
                     'data_final' => Carbon::createFromFormat('d-m-Y H:i', $dados['data_final']),
+                    'regulamento' => null,
                 ]
             );
 
