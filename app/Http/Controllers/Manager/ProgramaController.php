@@ -88,6 +88,7 @@ class ProgramaController extends Controller
         return response()->json([
             'ranking_top_10' => $ranking,
             'cadastros_semana_atual' => $participantesCadastradosNaSemana,
+            'cadastros_totais' => $participantesCadastroFinalizado + $participantesCadastroNaoFinalizado,
             'cadastros_nao_finalizados' => [
                 ['tipo' => 'Não Finalizados', 'total' => $participantesCadastroNaoFinalizado],
                 ['tipo' => 'Finalizados', 'total' => $participantesCadastroFinalizado]
