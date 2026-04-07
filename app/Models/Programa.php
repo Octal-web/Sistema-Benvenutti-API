@@ -2,15 +2,26 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Programa extends Model
 {
-    protected $table = 'dados_programa';
+    protected $table = 'programa';
+
+    public $timestamps = false;
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var string[]
+     */
+    protected $fillable = [
+        'titulo',
+        'descricao',
+        'data_inicio',
+        'data_final',
+        'regulamento'
+    ];
 
     protected $guarded = ['id'];
-
-    const CREATED_AT = 'criado';
-    const UPDATED_AT = 'modificado';
 }
