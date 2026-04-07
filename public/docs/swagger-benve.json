@@ -313,6 +313,7 @@
                         }
                     },
                     "cadastros_semana_atual": { "type": "integer" },
+                    "cadastros_totais": { "type": "integer" },
                     "cadastros_nao_finalizados": {
                         "type": "array",
                         "items": {
