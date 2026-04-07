@@ -3,6 +3,20 @@
 </div>
 
 O **Sistema Benvenutti** é uma API responsável pelo gerenciamento do sistema de pontuação de arquitetos da Benvenutti.
+  
+---
+
+## Índice
+
+- [Sobre](#sobre)
+- [Documentação](#documentacao)
+- [Tecnologias Utilizadas](#tecnologias-utilizadas)
+- [Arquitetura do Projeto](#arquitetura-do-projeto)
+- [Como Executar o Projeto](#como-executar-o-projeto)
+
+---
+
+<h2 id="sobre">Sobre:</h2>
 
 Através do painel de gerenciamento (manager), é possível:
 
@@ -20,15 +34,6 @@ E através do painel do participante (painel), é possível:
 - Atualizar dados do usuário
 - Listar o ranking dos 5 participantes mais próximos
 - Consultar informações do programa
-  
----
-
-## Índice
-
-- [Documentação](#documentacao)
-- [Tecnologias Utilizadas](#tecnologias-utilizadas)
-- [Arquitetura do Projeto](#arquitetura-do-projeto)
-- [Como Executar o Projeto](#como-executar-o-projeto)
 
 ---
 
