@@ -42,6 +42,8 @@ $router->group(['prefix' => '/painel', 'middleware' => 'participante'], function
     $router->put('/usuario/atualizar', 'UsuariosController@updateUsuario');
 
     $router->get('/ranking', 'RankingController');
+
+    $router->get('/programa', 'ProgramaController');
 });
 
 $router->group(['prefix' => '/manager'], function () use ($router) {
