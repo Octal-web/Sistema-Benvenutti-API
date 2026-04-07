@@ -3,28 +3,34 @@
 namespace App\Services;
 
 use App\Models\Programa;
-
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class ProgramaService
 {
-    public function atualizarDados($dadosPrograma)
+    public function cadastrarDados($dados, $arquivo)
     {
         DB::beginTransaction();
 
         try {
-            $programa = Programa::where('excluido', NULL)->first();
+            $programa = Programa::updateOrCreate(
+                ['id' => 1],
+                [
+                    'titulo' => $dados['titulo'],
+                    'descricao' => $dados['descricao'],
+                    'data_inicio' => Carbon::createFromFormat('d-m-Y H:i', $dados['data_inicio']),
+                    'data_final' => Carbon::createFromFormat('d-m-Y H:i', $dados['data_final']),
+                ]
+            );
 
-            if (!$programa) {
-                throw new \Exception('Dados originais não encontrados');
+            if ($arquivo) {
+                $regulamento = md5(uniqid(rand(), true)) . '.' . strtolower($arquivo->extension());
+                $arquivo->move(base_path('../media/content/files/'), $regulamento);
+
+                $programa->update([
+                    'regulamento' => $regulamento,
+                ]);
             }
-
-            $programa->update([
-                'nome_site' => $dadosPrograma['nome'],
-                'email_contato' => $dadosPrograma['email_contato'],
-                'telefone' => $dadosPrograma['telefone'],
-                'cadastros_ativos' => $dadosPrograma['cadastros_ativos'],
-            ]);
 
             DB::commit();
 
