@@ -93,6 +93,16 @@ $router->group(['prefix' => '/manager'], function () use ($router) {
             $router->delete('/fotos/excluir/{idFoto}', 'Manager\FotosController@deleteFoto');
         });
 
+        $router->group(['prefix' => '/slides'], function () use ($router) {
+            $router->get('/', 'Manager\SlidesController@getSlides');
+            $router->get('/{id}', 'Manager\SlidesController@getSlide');
+            $router->post('/novo', 'Manager\SlidesController@createSlide');
+            $router->post('/atualizar/{id}', 'Manager\SlidesController@updateSlide');
+            $router->put('/ordenar', 'Manager\SlidesController@orderSlides');
+            $router->put('/visibilidade/{id}', 'Manager\SlidesController@visibleSlide');
+            $router->delete('/excluir/{id}', 'Manager\SlidesController@deleteSlide');
+        });
+
         $router->get('/usuarios', 'Manager\UsuariosController@getUsuarios');
         $router->post('/usuarios/novo', 'Manager\UsuariosController@createUsuario');
         $router->get('/usuarios/{id}', 'Manager\UsuariosController@getUsuario');
