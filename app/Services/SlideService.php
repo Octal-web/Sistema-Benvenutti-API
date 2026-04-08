@@ -46,9 +46,9 @@ class SlideService
 
             DB::commit();
 
-            $this->compressor->compactarOuReverter($imagens['imagem']->getRealPath(), base_path('../media/content/editions/slides/d/' . $imagem));
+            $this->compressor->compactarOuReverter($imagens['imagem']->getRealPath(), base_path('../media/content/slides/d/' . $imagem));
 
-            $this->compressor->compactarOuReverter($imagens['imagem_mobile']->getRealPath(), base_path('../media/content/editions/slides/m/' .  $imagem_mobile));
+            $this->compressor->compactarOuReverter($imagens['imagem_mobile']->getRealPath(), base_path('../media/content/slides/m/' .  $imagem_mobile));
 
             return [
                 'slide' => [
@@ -95,7 +95,7 @@ class SlideService
                     'imagem' => $imagem,
                 ]);
 
-                $this->compressor->compactarOuReverter($imagens['imagem']->getRealPath(), base_path('../media/content/editions/slides/d/' . $imagem));
+                $this->compressor->compactarOuReverter($imagens['imagem']->getRealPath(), base_path('../media/content/slides/d/' . $imagem));
             }
 
             if ($imagens['imagem_mobile']) {
@@ -105,7 +105,7 @@ class SlideService
                     'imagem_mobile' => $imagem_mobile,
                 ]);
 
-                $this->compressor->compactarOuReverter($imagens['imagem_mobile']->getRealPath(), base_path('../media/content/editions/slides/m/' .  $imagem_mobile));
+                $this->compressor->compactarOuReverter($imagens['imagem_mobile']->getRealPath(), base_path('../media/content/slides/m/' .  $imagem_mobile));
             }
 
             DB::commit();

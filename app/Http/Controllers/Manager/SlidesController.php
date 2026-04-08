@@ -31,8 +31,8 @@ class SlidesController extends Controller
             ->map(function ($slide) {
                 return [
                     'id' => $slide->id,
-                    'imagem' => config('services.site.storage') . '/content/editions/slides/d/' . $slide->imagem,
-                    'imagem_mobile' => config('services.site.storage') . '/content/editions/slides/m/' . $slide->imagem_mobile,
+                    'imagem' => config('services.site.storage') . '/content/slides/d/' . $slide->imagem,
+                    'imagem_mobile' => config('services.site.storage') . '/content/slides/m/' . $slide->imagem_mobile,
                     'titulo' => $slide->titulo,
                     'visivel' => (bool)  $slide->visivel,
                     'ordem' => $slide->ordem
@@ -64,8 +64,8 @@ class SlidesController extends Controller
             'titulo' => $slide->titulo,
             'descricao' => $slide->descricao,
             'ordem' => $slide->ordem,
-            'imagem' => config('services.site.storage') . '/content/editions/slides/d/' . $slide->imagem,
-            'imagem_mobile' => config('services.site.storage') . '/content/editions/slides/m/' . $slide->imagem_mobile,
+            'imagem' => config('services.site.storage') . '/content/slides/d/' . $slide->imagem,
+            'imagem_mobile' => config('services.site.storage') . '/content/slides/m/' . $slide->imagem_mobile,
         ];
 
         return response()->json([
