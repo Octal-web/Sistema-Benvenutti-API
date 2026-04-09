@@ -103,7 +103,7 @@ class ProgramaController extends Controller
 
     public function getData()
     {
-        $programa = Programa::where('id', 1)->first();
+        $programa = Programa::first();
 
         if (!$programa) {
             return response()->json([

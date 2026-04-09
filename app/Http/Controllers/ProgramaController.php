@@ -11,7 +11,7 @@ class ProgramaController extends Controller
 {
     public function __invoke()
     {
-        $programa = Programa::where('id', 1)->first();
+        $programa = Programa::first();
 
         if (!$programa) {
             return response()->json([
