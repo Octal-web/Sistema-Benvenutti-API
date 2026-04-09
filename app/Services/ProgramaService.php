@@ -35,7 +35,14 @@ class ProgramaService
             DB::commit();
 
             return [
-                'programa' => $programa
+                'programa' => [
+                    'id' => $programa->id,
+                    'titulo' => $programa->titulo,
+                    'descricao' => $programa->descricao,
+                    'data_inicio' => $programa->data_inicio,
+                    'data_final' => $programa->data_final,
+                    'regulamento' => config('services.site.storage') . '/content/files/' . $programa->regulamento
+                ]
             ];
         } catch (\Exception $e) {
             DB::rollBack();
