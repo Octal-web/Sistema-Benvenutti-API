@@ -23,9 +23,9 @@ class CadastroService
 
             $participante->update([
                 'cpf' => preg_replace('/\D/', '', $dadosParticipante['cpf']),
-                'data_nascimento' => Carbon::createFromFormat('d/m/Y', $dadosParticipante['data_nascimento'])->format('Y-m-d'),
+                'data_nascimento' => Carbon::createFromFormat('Y-m-d', $dadosParticipante['data_nascimento'])->format('Y-m-d'),
                 'rg' => $dadosParticipante['rg'],
-                'data_expedicao_rg' => Carbon::createFromFormat('d/m/Y', $dadosParticipante['data_expedicao_rg'])->format('Y-m-d'),
+                'data_expedicao_rg' => Carbon::createFromFormat('Y-m-d', $dadosParticipante['data_expedicao_rg'])->format('Y-m-d'),
                 'fone_celular' => $dadosParticipante['fone_celular'],
                 'fone_emergencia' => $dadosParticipante['fone_emergencia'],
                 'etapa_cadastro' => 'concluido',
