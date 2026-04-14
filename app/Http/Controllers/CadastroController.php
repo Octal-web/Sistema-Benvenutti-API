@@ -36,6 +36,74 @@ class CadastroController extends Controller
         ]);
     }
 
+    public function termoAdesao(Request $request, $token)
+    {
+        $usuario = Usuario::where('token', $token)->firstOrFail();
+
+        if (!$usuario) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Token inválido.'
+            ], 404);
+        }
+
+        try {
+            $response = $this->cadastroService->termoAdesao($usuario);
+
+            return response()->json([
+                'success' => true,
+                'data' => $response,
+                'message' => 'Cadastro atualizado com sucesso.'
+            ]);
+        } catch (QueryException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro ao atualizado cadastro.',
+                'error' => $e->getMessage(),
+            ], 500);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro inesperado ao processar a solicitação.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function regulamento(Request $request, $token)
+    {
+        $usuario = Usuario::where('token', $token)->firstOrFail();
+
+        if (!$usuario) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Token inválido.'
+            ], 404);
+        }
+
+        try {
+            $response = $this->cadastroService->regulamento($usuario);
+
+            return response()->json([
+                'success' => true,
+                'data' => $response,
+                'message' => 'Cadastro atualizado com sucesso.'
+            ]);
+        } catch (QueryException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro ao atualizado cadastro.',
+                'error' => $e->getMessage(),
+            ], 500);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro inesperado ao processar a solicitação.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
     public function finalizar(Request $request, $token)
     {
         $usuario = Usuario::where('token', $token)->firstOrFail();

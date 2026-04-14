@@ -43,7 +43,11 @@ $router->group(['prefix' => '/painel', 'middleware' => 'participante'], function
 
     $router->get('/ranking', 'RankingController');
 
-    $router->get('/programa', 'ProgramaController');
+    $router->group(['prefix' => '/programa'], function () use ($router) {
+        $router->get('/', 'ProgramaController@index');
+        $router->get('/regulamento', 'ProgramaController@getRegulamento');
+        $router->get('/termo-adesao', 'ProgramaController@getTermoAdesao');
+    });
 
     $router->get('/edicoes', 'EdicoesController');
     $router->get('/slides', 'SlidesController');

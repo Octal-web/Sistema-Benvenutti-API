@@ -54,6 +54,9 @@ class ParticipantesController extends Controller
                     'nome' => $usuario->nome,
                     'email' => $usuario->email,
                     'etapa_cadastro' => $usuario->participante->etapa_cadastro,
+                    'termo_adesao' => $usuario->participante->termo_adesao
+                        ? config('services.site.storage') . '/content/files/terms/' . $usuario->participante->termo_adesao
+                        : null,
                     'pontos' => $totalPontos,
                     'ativo' => $usuario->ativo ? true : false,
 

@@ -117,8 +117,10 @@ class ProgramaController extends Controller
                 'descricao' => $programa->descricao,
                 'data_inicio' => $programa->data_inicio,
                 'data_final' => $programa->data_final,
-                'regulamento' => $programa->regulamento
-                    ? config('services.site.storage') . '/content/files/' . $programa->regulamento
+                'regulamento' => $programa->regulamento,
+                'termo_adesao' => $programa->termo_adesao,
+                'regulamento_arquivo' => $programa->regulamento_arquivo
+                    ? config('services.site.storage') . '/content/files/' . $programa->regulamento_arquivo
                     : null,
             ]
         ]);
@@ -127,51 +129,48 @@ class ProgramaController extends Controller
     public function postData(Request $request)
     {
         $this->validate($request, [
-            'titulo' => 'required|string|max:255',
-            'descricao' => 'required|string|max:255',
+            'titulo'      => 'required|string|max:255',
+            'descricao'   => 'required|string|max:255',
             'data_inicio' => 'required|date_format:Y-m-d H:i:s',
-            'data_final' => 'required|date_format:Y-m-d H:i:s|after:data_inicio',
-            'arq' => 'nullable|file|mimes:pdf,doc,docx|max:10240',
+            'data_final'  => 'required|date_format:Y-m-d H:i:s|after:data_inicio',
+            'regulamento' => 'required|string',
+            'termo_adesao' => 'required|string',
         ], [
-            'titulo.required' => 'Por favor, informe o titulo do programa.',
-            'titulo.string' => 'Valor inválido para o titulo.',
-            'titulo.max' => 'O título deve ter no máximo 255 caracteres',
-            'descricao.required' => 'Por favor, informe o descrição do programa.',
-            'descricao.string' => 'Valor inválido para a descrição.',
-            'descricao.max' => 'A descrição deve ter no máximo 255 caracteres',
+            'titulo.required'      => 'Por favor, informe o titulo do programa.',
+            'titulo.string'        => 'Valor inválido para o titulo.',
+            'titulo.max'           => 'O título deve ter no máximo 255 caracteres',
+            'descricao.required'   => 'Por favor, informe a descrição do programa.',
+            'descricao.string'     => 'Valor inválido para a descrição.',
+            'descricao.max'        => 'A descrição deve ter no máximo 255 caracteres',
             'data_inicio.required' => 'Por favor, informe a data de inicio do programa',
             'data_inicio.date_format' => 'O formato da data inicial é inválido',
-            'data_final.required' => 'Por favor, informe a data do final do programa',
+            'data_final.required'  => 'Por favor, informe a data do final do programa',
             'data_final.date_format' => 'O formato da data final é inválido',
-            'data_final.after' => 'A data final precisa ser após a data inicial',
-            'arq.file' => 'Valor inválido para o arquivo',
-            'arq.mimes' => 'Os formatos aceitos para o arquivo são PDF, DOC e DOCX.',
-            'arq.max' => 'O tamanho máximo de upload é 10MB.',
+            'data_final.after'     => 'A data final precisa ser após a data inicial',
+            'regulamento.required'     => 'Por favor, informe o regulamento do programa',
+            'termo_adesao.required'     => 'Por favor, informe o termo de adesão do programa',
         ]);
 
-        $dados = $request->only('titulo', 'descricao', 'data_inicio', 'data_final');
-
-        $arquivo = $request->file('arq');
+        $dados = $request->only('titulo', 'descricao', 'data_inicio', 'data_final', 'regulamento', 'termo_adesao');
 
         try {
-            $response = $this->programaService->cadastrarDados($dados, $arquivo);
-
+            $response = $this->programaService->cadastrarDados($dados);
             return response()->json([
                 'success' => true,
                 'message' => 'Dados alterados com sucesso.',
-                'data' => $response
+                'data'    => $response
             ], 201);
         } catch (QueryException $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erro ao atualizar os dados',
-                'error' => $e->getMessage(),
+                'error'   => $e->getMessage(),
             ], 500);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erro inesperado ao processar a solicitação.',
-                'error' => $e->getMessage()
+                'error'   => $e->getMessage()
             ], 500);
         }
     }
