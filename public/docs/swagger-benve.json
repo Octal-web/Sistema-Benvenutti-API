@@ -117,7 +117,9 @@
                     "pontos": { "type": "number" },
                     "posicao": { "type": "integer" },
                     "ultimo_acesso": { "type": "string" },
-                    "ultimo_acesso_ha": { "type": "string" }
+                    "ultimo_acesso_ha": { "type": "string" },
+                    "termo_adesao": { "type": "string" },
+                    "ativo": { "type": "boolean" }
                 }
             },
 
@@ -293,7 +295,9 @@
                     "descricao": { "type": "string" },
                     "data_inicio": { "type": "string", "format": "date-time" },
                     "data_final": { "type": "string", "format": "date-time" },
-                    "regulamento": { "type": "string", "format": "uri" }
+                    "regulamento": { "type": "string", "format": "uri" },
+                    "regulamento_arquivo": { "type": "string" },
+                    "termo_adesao": { "type": "string" }
                 }
             },
 
@@ -1563,10 +1567,7 @@
                                     "type": "object",
                                     "properties": {
                                         "programa": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/components/schemas/ProgramaItem"
-                                            }
+                                            "$ref": "#/components/schemas/ProgramaItem"
                                         }
                                     }
                                 }
@@ -1577,10 +1578,10 @@
             }
         },
 
-        "/manager/data/novo": {
+        "/manager/data/atualizar": {
             "post": {
                 "tags": ["Programa"],
-                "summary": "Criar programa",
+                "summary": "Atualizar programa",
                 "security": [{ "bearerAuth": [] }],
                 "requestBody": {
                     "required": true,
@@ -1592,7 +1593,9 @@
                                     "titulo",
                                     "descricao",
                                     "data_inicio",
-                                    "data_final"
+                                    "data_final",
+                                    "regulamento",
+                                    "termo_adesao"
                                 ],
                                 "properties": {
                                     "titulo": {
@@ -1609,10 +1612,11 @@
                                         "type": "string",
                                         "example": "07-04-2026 11:55"
                                     },
-                                    "arq": {
-                                        "type": "string",
-                                        "format": "binary"
-                                    }
+                                    "regulamento": {
+                                        "type": "string"
+                                    },
+                                    "termo_adesao": {
+                                        "type": "string"
                                 }
                             }
                         }
@@ -1723,6 +1727,58 @@
                                 }
                             }
                         }
+                    }
+                }
+            }
+        },
+
+        "/painel/programa/regulamento": {
+            "get": {
+                "tags": ["Painel"],
+                "summary": "Obter regulamento do programa",
+                "security": [{ "bearerAuth": [] }],
+                "responses": {
+                    "200": {
+                        "description": "Regulamento encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "regulamento": { "type": "string" }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Regulamento não encontrado"
+                    }
+                }
+            }
+        },
+
+        "/painel/programa/termo-adesao": {
+            "get": {
+                "tags": ["Painel"],
+                "summary": "Obter termo de adesão personalizado",
+                "security": [{ "bearerAuth": [] }],
+                "responses": {
+                    "200": {
+                        "description": "Termo de adesão processado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "termo_adesao": { "type": "string" }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Termo de adesão não encontrado"
                     }
                 }
             }

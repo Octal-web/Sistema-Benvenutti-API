@@ -50,7 +50,6 @@ class ProgramaController extends Controller
         }
 
         return response()->json([
-            'success'     => true,
             'regulamento' => $programa->regulamento,
         ]);
     }
@@ -79,7 +78,6 @@ class ProgramaController extends Controller
         $htmlFinal = str_replace(array_keys($map), array_values($map), $programa->termo_adesao);
 
         return response()->json([
-            'success'      => true,
             'termo_adesao' => $htmlFinal,
         ]);
     }
