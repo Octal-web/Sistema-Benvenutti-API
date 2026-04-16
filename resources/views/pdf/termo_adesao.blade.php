@@ -71,7 +71,7 @@
         <img src="{{ public_path('assets/img/logo.png') }}" alt="Logo">
     </div>
 
-    <div id="doc-titulo">Termoi de Adesão - {{ $titulo }}</div>
+    <div id="doc-titulo">Termo de Adesão - {{ $titulo }}</div>
 
     <div id="conteudo">
         {!! $regulamento !!}
