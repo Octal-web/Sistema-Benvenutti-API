@@ -68,7 +68,7 @@
     </div>
 
     <div id="header">
-        <img src="{{ public_path('assets/img/logo.png') }}" alt="Logo">
+        <img src="{{ base_path('public/assets/img/logo.png') }}" alt="Logo">
     </div>
 
     <div id="doc-titulo">{{ $titulo }}</div>
