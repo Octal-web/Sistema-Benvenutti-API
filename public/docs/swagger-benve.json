@@ -31,6 +31,37 @@
                 }
             },
 
+            "ParticipanteEdicaoItem": {
+                "type": "object",
+                "properties": {
+                    "id": { "type": "integer" },
+                    "nome": { "type": "string" },
+                    "ano": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2016"
+                    },
+                    "fotos": {
+                        "type": "object",
+                        "properties": {
+                            "id": { "type": "integer" },
+                            "imagem": { "type": "string", "format": "uri" }
+                        }
+                    }
+                }
+            },
+
+            "ParticipanteSlideItem": {
+                "type": "object",
+                "properties": {
+                    "id": { "type": "integer" },
+                    "imagem": { "type": "string", "format": "uri" },
+                    "imagem_mobile": { "type": "string", "format": "uri" },
+                    "titulo": { "type": "string" },
+                    "descricao": { "type": "string" }
+                }
+            },
+
             "PartipanteConvidadoDetalhe": {
                 "type": "object",
                 "properties": {
@@ -295,9 +326,7 @@
                     "descricao": { "type": "string" },
                     "data_inicio": { "type": "string", "format": "date-time" },
                     "data_final": { "type": "string", "format": "date-time" },
-                    "regulamento": { "type": "string", "format": "uri" },
-                    "regulamento_arquivo": { "type": "string" },
-                    "termo_adesao": { "type": "string" }
+                    "regulamento": { "type": "string", "format": "uri" }
                 }
             },
 
@@ -409,34 +438,6 @@
             }
         },
 
-        "/cadastro/finalizar/{token}": {
-            "post": {
-                "tags": ["Cadastro"],
-                "summary": "Finalizar cadastro do participante convidado",
-                "parameters": [
-                    {
-                        "name": "token",
-                        "in": "path",
-                        "required": true,
-                        "schema": { "type": "integer" }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/ParticipanteCadastro"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": { "description": "Cadastro realizado com sucesso." }
-                }
-            }
-        },
-
         "/cadastro/usuario/{token}": {
             "get": {
                 "tags": ["Cadastro"],
@@ -462,6 +463,156 @@
                                             "items": {
                                                 "$ref": "#/components/schemas/PartipanteConvidadoDetalhe"
                                             }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+
+        "/cadastro/termo-adesao": {
+            "get": {
+                "tags": ["Cadastro"],
+                "summary": "Detalhar o termo de adesão",
+                "responses": {
+                    "200": {
+                        "description": "Detalhe do termo de adesão",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "termo_adesao": {
+                                            "type": "string",
+                                            "description": "HTML do termo de adesão"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+
+        "/cadastro/regulamento": {
+            "get": {
+                "tags": ["Cadastro"],
+                "summary": "Detalhar o regulamento",
+                "responses": {
+                    "200": {
+                        "description": "Detalhe do regulamento",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "regulamento": {
+                                            "type": "string",
+                                            "description": "HTML do regulamento"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+
+        "/cadastro/finalizar/{token}": {
+            "post": {
+                "tags": ["Cadastro"],
+                "summary": "Finalizar com informações do participante convidado",
+                "parameters": [
+                    {
+                        "name": "token",
+                        "in": "path",
+                        "required": true,
+                        "schema": { "type": "integer" }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ParticipanteCadastro"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": { "description": "Cadastro realizado com sucesso." }
+                }
+            }
+        },
+
+        "/cadastro/termo-adesao/aceitar/{token}": {
+            "post": {
+                "tags": ["Cadastro"],
+                "summary": "Aceitar o termo de adesão",
+                "parameters": [
+                    {
+                        "name": "token",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Token do participante"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Termo de adesão aceito com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Termo de adesão aceito com sucesso."
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+
+        "/cadastro/regulamento/aceitar/{token}": {
+            "post": {
+                "tags": ["Cadastro"],
+                "summary": "Aceitar o regulamento",
+                "parameters": [
+                    {
+                        "name": "token",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Token do participante"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Regulamento aceito com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Cadastro atualizado com sucesso"
                                         }
                                     }
                                 }
@@ -1631,26 +1782,6 @@
             }
         },
 
-        "/painel/usuario": {
-            "get": {
-                "tags": ["Painel"],
-                "summary": "Listar detalhes do participante autenticado",
-                "security": [{ "bearerAuth": [] }],
-                "responses": {
-                    "200": {
-                        "description": "Lista detalhes do participante autenticado",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/UsuarioItem"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-
         "/painel/usuario/atualizar": {
             "put": {
                 "tags": ["Painel"],
@@ -1669,6 +1800,26 @@
                 "responses": {
                     "200": {
                         "description": "Cadastro atualizado com sucesso."
+                    }
+                }
+            }
+        },
+
+        "/painel/usuario": {
+            "get": {
+                "tags": ["Painel"],
+                "summary": "Listar detalhes do participante autenticado",
+                "security": [{ "bearerAuth": [] }],
+                "responses": {
+                    "200": {
+                        "description": "Lista detalhes do participante autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UsuarioItem"
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -1733,53 +1884,54 @@
             }
         },
 
-        "/painel/programa/regulamento": {
+        "/painel/edicoes": {
             "get": {
                 "tags": ["Painel"],
-                "summary": "Obter regulamento do programa",
+                "summary": "Listar as edições",
                 "security": [{ "bearerAuth": [] }],
                 "responses": {
                     "200": {
-                        "description": "Regulamento encontrado",
+                        "description": "Lista com as edições e fotos do programa",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "type": "object",
                                     "properties": {
-                                        "regulamento": { "type": "string" }
+                                        "edicoes": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/ParticipanteEdicaoItem"
+                                            }
+                                        }
                                     }
                                 }
                             }
                         }
-                    },
-                    "404": {
-                        "description": "Regulamento não encontrado"
                     }
                 }
             }
         },
 
-        "/painel/programa/termo-adesao": {
+        "/painel/slides": {
             "get": {
                 "tags": ["Painel"],
-                "summary": "Obter termo de adesão personalizado",
+                "summary": "Listar os slides",
                 "security": [{ "bearerAuth": [] }],
                 "responses": {
                     "200": {
-                        "description": "Termo de adesão processado",
+                        "description": "Lista com slides do programa",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "type": "object",
                                     "properties": {
-                                        "termo_adesao": { "type": "string" }
+                                        "slides": {
+                                            "$ref": "#/components/schemas/ParticipanteSlideItem"
+                                        }
                                     }
                                 }
                             }
                         }
-                    },
-                    "404": {
-                        "description": "Termo de adesão não encontrado"
                     }
                 }
             }
