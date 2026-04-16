@@ -70,8 +70,17 @@ class CadastroService
                 throw new \Exception('O termo de adesão ainda não foi configurado.');
             }
 
+            $map = [
+                '--nome_do_participante--' => $usuario->nome,
+                '--cpf_do_participante--'  => $usuario->participante->cpf ?? '',
+                '--email--'                => $usuario->email,
+                '--fone_celular--'         => $usuario->participante->fone_celular ?? '',
+            ];
+
+            $htmlFinal = str_replace(array_keys($map), array_values($map), $programa->termo_adesao);
+
             $termoPdf = $this->pdfGeradorService
-                ->gerar('pdf.termo_adesao', $programa->termo_adesao, $usuario->nome)
+                ->gerar('pdf.termo_adesao', $htmlFinal, $usuario->nome)
                 ->output();
 
 
