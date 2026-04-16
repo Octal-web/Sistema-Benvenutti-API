@@ -36,11 +36,11 @@ $router->group(['prefix' => '/cadastro'], function () use ($router) {
     $router->get('/usuario/{token}', 'CadastroController@getUsuario');
     $router->post('/finalizar/{token}', 'CadastroController@finalizar');
 
-    $router->get('/regulamento', 'ProgramaController@getRegulamento');
-    $router->post('/regulamento/aceitar/{token}', 'ProgramaController@acceptRegulamento');
+    $router->get('/regulamento', 'CadastroController@getRegulamento');
+    $router->post('/regulamento/aceitar/{token}', 'CadastroController@acceptRegulamento');
 
-    $router->get('/termo-adesao/{token}', 'ProgramaController@getTermoAdesao');
-    $router->post('/termo-adesao/aceitar/{token}', 'ProgramaController@acceptTermoAdesao');
+    $router->get('/termo-adesao/{token}', 'CadastroController@getTermoAdesao');
+    $router->post('/termo-adesao/aceitar/{token}', 'CadastroController@acceptTermoAdesao');
 });
 
 $router->group(['prefix' => '/painel', 'middleware' => 'participante'], function () use ($router) {
