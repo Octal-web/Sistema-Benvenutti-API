@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Usuario;
 use App\Services\CadastroService;
 use App\Http\Controllers\Controller;
+use App\Models\Programa;
 use Illuminate\Http\Request;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Auth;
 
 class CadastroController extends Controller
 {
@@ -19,7 +21,7 @@ class CadastroController extends Controller
 
     public function getUsuario($token)
     {
-        $usuario = Usuario::where('token', $token)->firstOrFail();
+        $usuario = Usuario::where('token', $token)->first();
 
         if (!$usuario) {
             return response()->json([
@@ -36,9 +38,53 @@ class CadastroController extends Controller
         ]);
     }
 
-    public function termoAdesao(Request $request, $token)
+    public function getRegulamento()
     {
-        $usuario = Usuario::where('token', $token)->firstOrFail();
+        $programa = Programa::first();
+
+        if (!$programa || empty($programa->regulamento)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Regulamento não encontrado.'
+            ], 404);
+        }
+
+        return response()->json([
+            'regulamento' => $programa->regulamento,
+        ]);
+    }
+
+    public function getTermoAdesao($token)
+    {
+        $programa = Programa::first();
+
+        if (!$programa || empty($programa->termo_adesao)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Termo de adesão não encontrado.'
+            ], 404);
+        }
+
+        $usuario   = Usuario::where('token', $token)->firstOrFail();
+        $participante = $usuario->participante;
+
+        $map = [
+            '--nome_do_participante--' => $usuario->nome,
+            '--cpf_do_participante--'  => $participante->cpf ?? '',
+            '--email--'                => $usuario->email,
+            '--fone_celular--'         => $participante->fone_celular ?? '',
+        ];
+
+        $htmlFinal = str_replace(array_keys($map), array_values($map), $programa->termo_adesao);
+
+        return response()->json([
+            'termo_adesao' => $htmlFinal,
+        ]);
+    }
+
+    public function acceptTermoAdesao(Request $request, $token)
+    {
+        $usuario = Usuario::where('token', $token)->first();
 
         if (!$usuario) {
             return response()->json([
@@ -53,12 +99,12 @@ class CadastroController extends Controller
             return response()->json([
                 'success' => true,
                 'data' => $response,
-                'message' => 'Cadastro atualizado com sucesso.'
+                'message' => 'Termo de adesão aceito com sucesso.'
             ]);
         } catch (QueryException $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Erro ao atualizado cadastro.',
+                'message' => 'Erro ao aceitar o termo de adesão aceito.',
                 'error' => $e->getMessage(),
             ], 500);
         } catch (\Exception $e) {
@@ -70,7 +116,7 @@ class CadastroController extends Controller
         }
     }
 
-    public function regulamento(Request $request, $token)
+    public function acceptRegulamento(Request $request, $token)
     {
         $usuario = Usuario::where('token', $token)->firstOrFail();
 
