@@ -35,6 +35,12 @@ $router->group(['prefix' => '/senha'], function () use ($router) {
 $router->group(['prefix' => '/cadastro'], function () use ($router) {
     $router->get('/usuario/{token}', 'CadastroController@getUsuario');
     $router->post('/finalizar/{token}', 'CadastroController@finalizar');
+
+    $router->get('/regulamento', 'ProgramaController@getRegulamento');
+    $router->post('/regulamento/aceitar/{token}', 'ProgramaController@acceptRegulamento');
+
+    $router->get('/termo-adesao/{token}', 'ProgramaController@getTermoAdesao');
+    $router->post('/termo-adesao/aceitar/{token}', 'ProgramaController@acceptTermoAdesao');
 });
 
 $router->group(['prefix' => '/painel', 'middleware' => 'participante'], function () use ($router) {
@@ -43,11 +49,7 @@ $router->group(['prefix' => '/painel', 'middleware' => 'participante'], function
 
     $router->get('/ranking', 'RankingController');
 
-    $router->group(['prefix' => '/programa'], function () use ($router) {
-        $router->get('/', 'ProgramaController@index');
-        $router->get('/regulamento', 'ProgramaController@getRegulamento');
-        $router->get('/termo-adesao', 'ProgramaController@getTermoAdesao');
-    });
+    $router->get('/programa', 'ProgramaController');
 
     $router->get('/edicoes', 'EdicoesController');
     $router->get('/slides', 'SlidesController');
