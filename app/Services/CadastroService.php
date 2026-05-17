@@ -80,9 +80,8 @@ class CadastroService
             $htmlFinal = str_replace(array_keys($map), array_values($map), $programa->termo_adesao);
 
             $termoPdf = $this->pdfGeradorService
-                ->gerar('pdf.termo_adesao', $htmlFinal, $usuario->nome)
+                ->gerar('pdf.termo_adesao', $htmlFinal, $programa->titulo ?? 'BENVENUTTI EXPERIENCE')
                 ->output();
-
 
             $nomeArquivo = md5(uniqid(rand(), true)) . '.pdf';
             $caminho = base_path('../media/content/files/terms/' . $nomeArquivo);
