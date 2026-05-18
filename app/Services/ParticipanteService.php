@@ -33,7 +33,7 @@ class ParticipanteService
                 'etapa_cadastro' => 'convidado',
             ]);
 
-            $this->sendConviteEmail($usuario->email, $usuario->nome ?? null, $usuario->token);
+            $this->sendConviteEmail($usuario->email, $usuario->token, $usuario->nome ?? null);
 
             DB::commit();
 
@@ -81,9 +81,13 @@ class ParticipanteService
                 'cpf' => preg_replace('/\D/', '', $dadosParticipante['cpf']),
                 'data_nascimento' => Carbon::createFromFormat('Y-m-d', $dadosParticipante['data_nascimento'])->format('Y-m-d'),
                 'rg' => $dadosParticipante['rg'],
-                'data_expedicao_rg' => Carbon::createFromFormat('Y-m-d', $dadosParticipante['data_expedicao_rg'])->format('Y-m-d'),
                 'fone_celular' => $dadosParticipante['fone_celular'],
                 'fone_emergencia' => $dadosParticipante['fone_emergencia'],
+                'cidade_id' => $dadosParticipante['cidade'],
+                'estado_id' => $dadosParticipante['estado'],
+                'cargo' => $dadosParticipante['cargo'],
+                'cnpj' => $dadosParticipante['cnpj'] ?? null,
+                'instagram' => $dadosParticipante['instagram'],
                 'restricao_alimentar' => $dadosParticipante['restricao_alimentar'],
                 'restricao_alimentar_qual' => $dadosParticipante['restricao_alimentar']
                     ? ($dadosParticipante['restricao_alimentar_qual'] ?? null)
@@ -217,7 +221,7 @@ class ParticipanteService
         }
     }
 
-    private function sendConviteEmail($email, $nome = null, $token)
+    private function sendConviteEmail($email, $token, $nome = null)
     {
         $data = [
             'email' => $email,
