@@ -33,7 +33,8 @@ class CadastroController extends Controller
         return response()->json([
             'usuario' => [
                 'nome' => $usuario->nome,
-                'email' => $usuario->email
+                'email' => $usuario->email,
+                'etapa_cadastro' => $usuario->participante->etapa_cadastro
             ]
         ]);
     }
@@ -165,7 +166,11 @@ class CadastroController extends Controller
 
         $this->validate($request, [
             'rg' => 'required|string|max:20',
-            'data_expedicao_rg' => 'required|date_format:Y-m-d|before_or_equal:today',
+            'cnpj' => 'nullable|max:14',
+            'cidade' => 'required|integer',
+            'estado' => 'required|integer',
+            'instagram' => 'required|max:30',
+            'cargo' => 'required|max:100',
             'cpf' => 'required|cpf|unique:cadastros_participantes,cpf,' . $participanteId . ',id,excluido,NULL',
             'data_nascimento' => 'required|date_format:Y-m-d|before_or_equal:today',
             'fone_celular' => 'required|celular_com_ddd',
@@ -179,15 +184,21 @@ class CadastroController extends Controller
             'medicamento_dosagem' => 'nullable|max:24',
             'problema_saude' => 'required|boolean',
             'problema_saude_qual' => 'nullable|max:72',
-            'nome' => 'required|string|max:255',
+            'nome' => 'required|string|regex:/^\S+\s+\S+.*$/|min:5|max:255',
             'email' => 'required|email|max:255|unique:usuarios,email,' . $usuario->id . ',id,excluido,NULL',
             'password' => 'required|string|min:8|confirmed',
             'password_confirmation' => 'required',
         ], [
             'rg.required' => 'Por favor, informe seu RG.',
-            'data_expedicao_rg.required' => 'Por favor, informe a data de expedição do seu RG.',
-            'data_expedicao_rg.date' => 'Por favor, informe uma data válida para a expedição do RG.',
-            'data_expedicao_rg.before_or_equal' => 'A data de expedição do RG não pode ser uma data futura.',
+            'cnpj.max' => 'O CNPJ deve ter no máximo 14 caracteres.',
+            'cidade.required' => 'Por favor, informe sua cidade.',
+            'cidade.integer' => 'Por favor, informe uma cidade válida.',
+            'estado.required' => 'Por favor, informe seu estado.',
+            'estado.integer' => 'Por favor, informe um estado válido.',
+            'instagram.required' => 'Por favor, informe seu Instagram.',
+            'instagram.max' => 'O Instagram deve ter no máximo 30 caracteres.',
+            'cargo.required' => 'Por favor, informe seu cargo.',
+            'cargo.max' => 'O Cargo deve ter no máximo 100 caracteres.',
             'data_nascimento.required' => 'Por favor, informe sua data de nascimento.',
             'data_nascimento.date' => 'Por favor, informe uma data de nascimento válida.',
             'data_nascimento.before_or_equal' => 'A data de nascimento não pode ser uma data futura.',
@@ -212,6 +223,8 @@ class CadastroController extends Controller
             'problema_saude.boolean' => 'Valor inválido para problema de saúde, atualize a página.',
             'problema_saude_qual.max' => 'O problema de saúde deve ter no máximo 72 caracteres.',
             'nome.required' => 'Por favor, informe seu nome.',
+            'nome.regex' => 'Por favor, informe seu nome com sobrenome.',
+            'nome.min' => 'O nome deve ter no mínimo 5 caracteres.',
             'email.required' => 'Por favor, informe seu e-mail.',
             'email.email' => 'Por favor, informe um e-mail válido.',
             'email.unique' => 'Este e-mail já está registrado no programa.',
@@ -225,7 +238,7 @@ class CadastroController extends Controller
         ]);
 
         $dadosUsuario = $request->only(['nome', 'email', 'password']);
-        $dadosParticipante = $request->only(['cpf', 'data_nascimento', 'rg', 'data_expedicao_rg', 'fone_celular', 'fone_emergencia', 'restricao_alimentar', 'restricao_alimentar_qual', 'limitacao', 'limitacao_qual', 'medicamento', 'medicamento_qual', 'medicamento_dosagem', 'problema_saude', 'problema_saude_qual']);
+        $dadosParticipante = $request->only(['cpf', 'data_nascimento', 'cargo', 'rg', 'cnpj', 'cidade', 'estado', 'instagram', 'fone_celular', 'fone_emergencia', 'restricao_alimentar', 'restricao_alimentar_qual', 'limitacao', 'limitacao_qual', 'medicamento', 'medicamento_qual', 'medicamento_dosagem', 'problema_saude', 'problema_saude_qual']);
 
         try {
             $response = $this->cadastroService->completarCadastro($usuario, $dadosUsuario, $dadosParticipante);
