@@ -43,6 +43,11 @@ $router->group(['prefix' => '/cadastro'], function () use ($router) {
     $router->post('/termo-adesao/aceitar/{token}', 'CadastroController@acceptTermoAdesao');
 });
 
+$router->group(['prefix' => '/estados'], function () use ($router) {
+    $router->get('/', 'CidadesController@getEstados');
+    $router->get('/{id}/cidades', 'CidadesController@getCidades');
+});
+
 $router->group(['prefix' => '/painel', 'middleware' => 'participante'], function () use ($router) {
     $router->get('/usuario', 'UsuariosController@getUsuario');
     $router->put('/usuario/atualizar', 'UsuariosController@updateUsuario');
@@ -99,7 +104,7 @@ $router->group(['prefix' => '/manager'], function () use ($router) {
             $router->put('/fotos/visibilidade/{idFoto}', 'Manager\FotosController@visibleFoto');
             $router->delete('/fotos/excluir/{idFoto}', 'Manager\FotosController@deleteFoto');
         });
-        
+
         $router->get('/usuarios', 'Manager\UsuariosController@getUsuarios');
         $router->post('/usuarios/novo', 'Manager\UsuariosController@createUsuario');
         $router->get('/usuarios/{id}', 'Manager\UsuariosController@getUsuario');
