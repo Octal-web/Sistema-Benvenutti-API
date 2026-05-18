@@ -199,7 +199,11 @@ class ParticipantesController extends Controller
             'email' => $participante->email,
             'cpf' => $participante->participante->cpf ? vsprintf("%s%s%s.%s%s%s.%s%s%s-%s%s", str_split($participante->participante->cpf)) : NULL,
             'rg' => $participante->participante->rg,
-            'data_expedicao_rg' => $participante->participante->data_expedicao_rg,
+            'cnpj' => $participante->participante->cnpj ? vsprintf("%s%s.%s%s%s.%s%s%s/%s%s%s%s-%s%s", str_split($participante->participante->cnpj)) : NULL,
+            'cidade' => $participante->participante->cidade_id,
+            'estado' => $participante->participante->estado_id,
+            'instagram' => $participante->participante->instagram,
+            'cargo' => $participante->participante->cargo,
             'data_nascimento' => $participante->participante->data_nascimento,
             'fone_celular' => $participante->participante->fone_celular,
             'fone_emergencia' => $participante->participante->fone_emergencia,
@@ -254,14 +258,18 @@ class ParticipantesController extends Controller
         }
 
         $this->validate($request, [
-            'nome' => 'required|string|max:255',
+            'nome' => 'required|string|regex:/^\S+\s+\S+.*$/|min:5|max:255',
             'email' => 'required|email|unique:usuarios,email,' . $participante->id,
             'password' => 'nullable|string|min:6',
             'ativo' => 'required|boolean',
             'cpf' => 'required|cpf|unique:cadastros_participantes,cpf,' . $participante->participante->id,
             'data_nascimento' => 'required|date_format:Y-m-d|before_or_equal:today',
             'rg' => 'required|string|max:20',
-            'data_expedicao_rg' => 'required|date_format:Y-m-d|before_or_equal:today',
+            'cnpj' => 'nullable|cnpj',
+            'cidade' => 'required|exists:cidades,id',
+            'estado' => 'required|exists:estados,id',
+            'instagram' => 'required|max:30',
+            'cargo' => 'required|max:100',
             'fone_celular' => 'required|celular_com_ddd',
             // 'fone_fixo' => 'nullable|telefone_com_ddd',
             // 'fone_comercial' => 'required|celular_com_ddd',
@@ -276,6 +284,8 @@ class ParticipantesController extends Controller
             'problema_saude_qual' => 'nullable|max:120',
         ], [
             'nome.required' => 'Por favor, informe seu nome.',
+            'nome.regex' => 'Por favor, informe seu nome com sobrenome.',
+            'nome.min' => 'O nome deve ter no mínimo 5 caracteres.',
             'email.required' => 'Por favor, informe seu e-mail.',
             'email.email' => 'Por favor, informe um e-mail válido.',
             'email.unique' => 'Este e-mail já está registrado no programa.',
@@ -290,9 +300,15 @@ class ParticipantesController extends Controller
             'data_nascimento.date' => 'Por favor, informe uma data de nascimento válida.',
             'data_nascimento.before_or_equal' => 'A data de nascimento não pode ser uma data futura.',
             'rg.required' => 'Por favor, informe seu RG.',
-            'data_expedicao_rg.required' => 'Por favor, informe a data de expedição do seu RG.',
-            'data_expedicao_rg.date' => 'Por favor, informe uma data válida para a expedição do RG.',
-            'data_expedicao_rg.before_or_equal' => 'A data de expedição do RG não pode ser uma data futura.',
+            'cnpj.cnpj' => 'Por favor, informe um CNPJ válido.',
+            'cidade.required' => 'Por favor, informe sua cidade.',
+            'cidade.exists' => 'Por favor, informe uma cidade válida.',
+            'estado.required' => 'Por favor, informe seu estado.',
+            'estado.exists' => 'Por favor, informe um estado válido.',
+            'instagram.required' => 'Por favor, informe seu Instagram.',
+            'instagram.max' => 'O Instagram deve ter no máximo 30 caracteres.',
+            'cargo.required' => 'Por favor, informe seu cargo.',
+            'cargo.max' => 'O Cargo deve ter no máximo 100 caracteres.',
             'fone_celular.required' => 'Por favor, informe seu telefone.',
             'fone_celular.celular_com_ddd' => 'Por favor, informe um telefone válido.',
             'fone_emergencia.required' => 'Por favor, informe um contato para emergências.',
@@ -312,7 +328,7 @@ class ParticipantesController extends Controller
         ]);
 
         $dadosUsuario = $request->only(['nome', 'email', 'password', 'ativo']);
-        $dadosParticipante = $request->only(['cpf', 'data_nascimento', 'rg', 'data_expedicao_rg', 'fone_celular', 'fone_emergencia', 'restricao_alimentar', 'restricao_alimentar_qual', 'limitacao', 'limitacao_qual', 'medicamento', 'medicamento_qual', 'medicamento_dosagem', 'problema_saude', 'problema_saude_qual']);
+        $dadosParticipante = $request->only(['cpf', 'data_nascimento', 'rg', 'cargo', 'cnpj', 'cidade', 'estado', 'instagram', 'fone_celular', 'fone_emergencia', 'restricao_alimentar', 'restricao_alimentar_qual', 'limitacao', 'limitacao_qual', 'medicamento', 'medicamento_qual', 'medicamento_dosagem', 'problema_saude', 'problema_saude_qual']);
 
         try {
             $response = $this->participanteService->atualizarParticipante($dadosUsuario, $dadosParticipante, $id);
