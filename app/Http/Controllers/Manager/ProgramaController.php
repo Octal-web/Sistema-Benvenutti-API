@@ -117,11 +117,11 @@ class ProgramaController extends Controller
                 'descricao' => $programa->descricao,
                 'data_inicio' => $programa->data_inicio,
                 'data_final' => $programa->data_final,
-                'regulamento' => $programa->regulamento,
+                // 'regulamento' => $programa->regulamento,
                 'termo_adesao' => $programa->termo_adesao,
-                'regulamento_arquivo' => $programa->regulamento_arquivo
-                    ? config('services.site.storage') . '/content/files/' . $programa->regulamento_arquivo
-                    : null,
+                // 'regulamento_arquivo' => $programa->regulamento_arquivo
+                //     ? config('services.site.storage') . '/content/files/' . $programa->regulamento_arquivo
+                //     : null,
             ]
         ]);
     }
@@ -133,7 +133,7 @@ class ProgramaController extends Controller
             'descricao'   => 'required|string|max:255',
             'data_inicio' => 'required|date_format:Y-m-d H:i:s',
             'data_final'  => 'required|date_format:Y-m-d H:i:s|after:data_inicio',
-            'regulamento' => 'required|string',
+            // 'regulamento' => 'required|string',
             'termo_adesao' => 'required|string',
         ], [
             'titulo.required'      => 'Por favor, informe o titulo do programa.',
@@ -147,7 +147,7 @@ class ProgramaController extends Controller
             'data_final.required'  => 'Por favor, informe a data do final do programa',
             'data_final.date_format' => 'O formato da data final é inválido',
             'data_final.after'     => 'A data final precisa ser após a data inicial',
-            'regulamento.required'     => 'Por favor, informe o regulamento do programa',
+            // 'regulamento.required'     => 'Por favor, informe o regulamento do programa',
             'termo_adesao.required'     => 'Por favor, informe o termo de adesão do programa',
         ]);
 
