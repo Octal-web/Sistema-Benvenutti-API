@@ -73,12 +73,22 @@ class CadastroService
             if (empty($programa->termo_adesao)) {
                 throw new \Exception('O termo de adesão ainda não foi configurado.');
             }
+            $participante = $usuario->participante;
+
+            $textoEndereco = $participante->estado->nome . ', ' . $participante->cidade->nome;
+            Carbon::setLocale('pt_BR');
 
             $map = [
                 '--nome_do_participante--' => $usuario->nome,
-                '--cpf_do_participante--'  => $usuario->participante->cpf ?? '',
-                '--email--'                => $usuario->email,
-                '--fone_celular--'         => $usuario->participante->fone_celular ?? '',
+                '--cpf_do_participante--'  => $participante->cpf ?? '',
+                '--email_do_participante--' => $usuario->email,
+                '--fone_celular_do_participante--' => $participante->fone_celular,
+                '--rg_do_participante--' => $participante->rg,
+                '--cargo_do_participante--' => $participante->cargo,
+                '--cnpj_do_participante--' => $participante->cnpj ?? '',
+                '--endereco_do_participante--' => $textoEndereco,
+                '--instagram_do_participante--' => $participante->instagram,
+                '--data_atual--' => Carbon::now()->translatedFormat('d \\d\\e F \\d\\e Y')
             ];
 
             $htmlFinal = str_replace(array_keys($map), array_values($map), $programa->termo_adesao);
@@ -94,7 +104,7 @@ class CadastroService
 
 
             $usuario->participante->update([
-                'etapa_cadastro' => 'regulamento',
+                'etapa_cadastro' => 'concluido',
                 'termo_adesao'   => $nomeArquivo
             ]);
 
@@ -108,22 +118,22 @@ class CadastroService
         }
     }
 
-    public function regulamento($usuario)
-    {
-        try {
-            DB::beginTransaction();
+    // public function regulamento($usuario)
+    // {
+    //     try {
+    //         DB::beginTransaction();
 
-            $usuario->participante->update([
-                'etapa_cadastro' => 'concluido'
-            ]);
+    //         $usuario->participante->update([
+    //             'etapa_cadastro' => 'concluido'
+    //         ]);
 
-            DB::commit();
+    //         DB::commit();
 
-            return $usuario->load('participante');
-        } catch (\Exception $e) {
-            DB::rollback();
+    //         return $usuario->load('participante');
+    //     } catch (\Exception $e) {
+    //         DB::rollback();
 
-            throw new \Exception('Ocorreu um erro ao aceitar o regulamento: ' . $e->getMessage());
-        }
-    }
+    //         throw new \Exception('Ocorreu um erro ao aceitar o regulamento: ' . $e->getMessage());
+    //     }
+    // }
 }
