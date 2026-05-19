@@ -58,17 +58,13 @@ class RankingController extends Controller
             return $item['id'] === $usuarioAutenticado->id;
         });
 
-        $meio = floor(5 / 2);
+        $participantesAoRedor = null;
 
-        $inicio = max(0, $indexUsuario - $meio);
-        $fim = $inicio + 5 - 1;
-
-        if ($fim >= $participantes->count()) {
-            $fim = $participantes->count() - 1;
-            $inicio = max(0, $fim - 5 + 1);
+        if ($indexUsuario > 4) {
+            $participantesAoRedor = $participantes->slice(0, 3)->concat([$participantes[$indexUsuario]])->values();
+        } else {
+            $participantesAoRedor = $participantes->slice(0, 3)->values();
         }
-
-        $participantesAoRedor = $participantes->slice($inicio, $fim - $inicio + 1)->values();
 
         return response()->json([
             'participantes' => $participantesAoRedor,
