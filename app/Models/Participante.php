@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Participante extends Model
@@ -13,12 +12,24 @@ class Participante extends Model
 
     const CREATED_AT = 'criado';
     const UPDATED_AT = 'modificado';
-    
-    public function usuario() {
+
+    public function usuario()
+    {
         return $this->belongsTo(Usuario::class);
     }
-    
-    public function pontos() {
+
+    public function pontos()
+    {
         return $this->hasMany(Ponto::class);
+    }
+
+    public function estado()
+    {
+        return $this->belongsTo(Estado::class);
+    }
+
+    public function cidade()
+    {
+        return $this->belongsTo(Cidade::class);
     }
 }
