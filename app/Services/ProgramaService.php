@@ -29,22 +29,22 @@ class ProgramaService
                     'descricao' => $dados['descricao'],
                     'data_inicio' => Carbon::createFromFormat('Y-m-d H:i:s', $dados['data_inicio']),
                     'data_final' => Carbon::createFromFormat('Y-m-d H:i:s', $dados['data_final']),
-                    'regulamento' => $dados['regulamento'],
+                    // 'regulamento' => $dados['regulamento'],
                     'termo_adesao' => $dados['termo_adesao'],
                 ]
             );
 
-            $regulamentoPdf = $this->pdfGeradorService->gerar('pdf.regulamento', $dados['regulamento'], $dados['titulo'])->output();
+            // $regulamentoPdf = $this->pdfGeradorService->gerar('pdf.regulamento', $dados['regulamento'], $dados['titulo'])->output();
 
 
-            $nomeArquivo = md5(uniqid(rand(), true)) . '.pdf';
-            $caminho = base_path('../media/content/files/' . $nomeArquivo);
+            // $nomeArquivo = md5(uniqid(rand(), true)) . '.pdf';
+            // $caminho = base_path('../media/content/files/' . $nomeArquivo);
 
-            file_put_contents($caminho, $regulamentoPdf);
+            // file_put_contents($caminho, $regulamentoPdf);
 
-            $programa->update([
-                'regulamento_arquivo' => $nomeArquivo,
-            ]);
+            // $programa->update([
+            //     'regulamento_arquivo' => $nomeArquivo,
+            // ]);
 
             DB::commit();
 
@@ -55,7 +55,7 @@ class ProgramaService
                     'descricao' => $programa->descricao,
                     'data_inicio' => $programa->data_inicio,
                     'data_final' => $programa->data_final,
-                    'regulamento' =>  $programa->regulamento_arquivo ? config('services.site.storage') . '/content/files/' . $programa->regulamento_arquivo : null
+                    // 'regulamento' =>  $programa->regulamento_arquivo ? config('services.site.storage') . '/content/files/' . $programa->regulamento_arquivo : null
                 ]
             ];
         } catch (\Exception $e) {
@@ -63,7 +63,7 @@ class ProgramaService
             throw new \Exception('Erro ao atualizar os dados: ' . $e->getMessage());
         }
     }
-    
+
     public function resetarPrograma()
     {
         DB::beginTransaction();
@@ -78,7 +78,7 @@ class ProgramaService
                     'termo_adesao' => null,
                 ]);
 
-            DB::commit();            
+            DB::commit();
 
             DB::statement('SET FOREIGN_KEY_CHECKS=0;');
             DB::table('pontos')->truncate();
