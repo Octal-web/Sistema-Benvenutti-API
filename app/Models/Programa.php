@@ -20,8 +20,8 @@ class Programa extends Model
         'descricao',
         'data_inicio',
         'data_final',
-        'regulamento',
-        'regulamento_arquivo',
+        // 'regulamento',
+        // 'regulamento_arquivo',
         'termo_adesao'
     ];
 
