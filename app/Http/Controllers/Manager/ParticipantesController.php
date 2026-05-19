@@ -199,7 +199,7 @@ class ParticipantesController extends Controller
             'email' => $participante->email,
             'cpf' => $participante->participante->cpf ? vsprintf("%s%s%s.%s%s%s.%s%s%s-%s%s", str_split($participante->participante->cpf)) : NULL,
             'rg' => $participante->participante->rg,
-            'cnpj' => $participante->participante->cnpj ? vsprintf("%s%s.%s%s%s.%s%s%s/%s%s%s%s-%s%s", str_split($participante->participante->cnpj)) : NULL,
+            'cnpj' => $participante->participante->cnpj ?? NULL,
             'cidade' => $participante->participante->cidade_id,
             'estado' => $participante->participante->estado_id,
             'instagram' => $participante->participante->instagram,
