@@ -36,8 +36,8 @@ $router->group(['prefix' => '/cadastro'], function () use ($router) {
     $router->get('/usuario/{token}', 'CadastroController@getUsuario');
     $router->post('/finalizar/{token}', 'CadastroController@finalizar');
 
-    $router->get('/regulamento', 'CadastroController@getRegulamento');
-    $router->post('/regulamento/aceitar/{token}', 'CadastroController@acceptRegulamento');
+    // $router->get('/regulamento', 'CadastroController@getRegulamento');
+    // $router->post('/regulamento/aceitar/{token}', 'CadastroController@acceptRegulamento');
 
     $router->get('/termo-adesao/{token}', 'CadastroController@getTermoAdesao');
     $router->post('/termo-adesao/aceitar/{token}', 'CadastroController@acceptTermoAdesao');
