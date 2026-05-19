@@ -5,7 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Usuario;
 use App\Services\CadastroService;
 use App\Http\Controllers\Controller;
+use App\Models\Cidade;
+use App\Models\Estado;
 use App\Models\Programa;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Auth;
@@ -39,21 +42,21 @@ class CadastroController extends Controller
         ]);
     }
 
-    public function getRegulamento()
-    {
-        $programa = Programa::first();
+    // public function getRegulamento()
+    // {
+    //     $programa = Programa::first();
 
-        if (!$programa || empty($programa->regulamento)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Regulamento não encontrado.'
-            ], 404);
-        }
+    //     if (!$programa || empty($programa->regulamento)) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Regulamento não encontrado.'
+    //         ], 404);
+    //     }
 
-        return response()->json([
-            'regulamento' => $programa->regulamento,
-        ]);
-    }
+    //     return response()->json([
+    //         'regulamento' => $programa->regulamento,
+    //     ]);
+    // }
 
     public function getTermoAdesao($token)
     {
@@ -69,11 +72,20 @@ class CadastroController extends Controller
         $usuario   = Usuario::where('token', $token)->firstOrFail();
         $participante = $usuario->participante;
 
+        $textoEndereco = $participante->estado->nome . ', ' . $participante->cidade->nome;
+        Carbon::setLocale('pt_BR');
+
         $map = [
             '--nome_do_participante--' => $usuario->nome,
             '--cpf_do_participante--'  => $participante->cpf ?? '',
-            '--email--'                => $usuario->email,
-            '--fone_celular--'         => $participante->fone_celular ?? '',
+            '--email_do_participante--' => $usuario->email,
+            '--fone_celular_do_participante--' => $participante->fone_celular,
+            '--rg_do_participante--' => $participante->rg,
+            '--cargo_do_participante--' => $participante->cargo,
+            '--cnpj_do_participante--' => $participante->cnpj ?? '',
+            '--endereco_do_participante--' => $textoEndereco,
+            '--instagram_do_participante--' => $participante->instagram,
+            '--data_atual--' => Carbon::now()->translatedFormat('d \\d\\e F \\d\\e Y')
         ];
 
         $htmlFinal = str_replace(array_keys($map), array_values($map), $programa->termo_adesao);
@@ -117,39 +129,39 @@ class CadastroController extends Controller
         }
     }
 
-    public function acceptRegulamento(Request $request, $token)
-    {
-        $usuario = Usuario::where('token', $token)->firstOrFail();
+    // public function acceptRegulamento(Request $request, $token)
+    // {
+    //     $usuario = Usuario::where('token', $token)->firstOrFail();
 
-        if (!$usuario) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Token inválido.'
-            ], 404);
-        }
+    //     if (!$usuario) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Token inválido.'
+    //         ], 404);
+    //     }
 
-        try {
-            $response = $this->cadastroService->regulamento($usuario);
+    //     try {
+    //         $response = $this->cadastroService->regulamento($usuario);
 
-            return response()->json([
-                'success' => true,
-                'data' => $response,
-                'message' => 'Cadastro atualizado com sucesso.'
-            ]);
-        } catch (QueryException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Erro ao atualizado cadastro.',
-                'error' => $e->getMessage(),
-            ], 500);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Erro inesperado ao processar a solicitação.',
-                'error' => $e->getMessage(),
-            ], 500);
-        }
-    }
+    //         return response()->json([
+    //             'success' => true,
+    //             'data' => $response,
+    //             'message' => 'Cadastro atualizado com sucesso.'
+    //         ]);
+    //     } catch (QueryException $e) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Erro ao atualizado cadastro.',
+    //             'error' => $e->getMessage(),
+    //         ], 500);
+    //     } catch (\Exception $e) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Erro inesperado ao processar a solicitação.',
+    //             'error' => $e->getMessage(),
+    //         ], 500);
+    //     }
+    // }
 
     public function finalizar(Request $request, $token)
     {
@@ -166,7 +178,7 @@ class CadastroController extends Controller
 
         $this->validate($request, [
             'rg' => 'required|string|max:20',
-            'cnpj' => 'nullable|max:14',
+            'cnpj' => 'nullable|cnpj',
             'cidade' => 'required|integer',
             'estado' => 'required|integer',
             'instagram' => 'required|max:30',
@@ -190,7 +202,7 @@ class CadastroController extends Controller
             'password_confirmation' => 'required',
         ], [
             'rg.required' => 'Por favor, informe seu RG.',
-            'cnpj.max' => 'O CNPJ deve ter no máximo 14 caracteres.',
+            'cnpj.cnpj' => 'Por favor, informe um CNPJ válido.',
             'cidade.required' => 'Por favor, informe sua cidade.',
             'cidade.integer' => 'Por favor, informe uma cidade válida.',
             'estado.required' => 'Por favor, informe seu estado.',
